@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChoreRobotics — All Screens</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      background: #050608;
+      padding: 40px 20px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 15px;
+      margin-bottom: 48px;
+    }
+    .screen-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 48px;
+      justify-content: center;
+    }
+    .screen-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .screen-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .screen-link {
+      display: block;
+      border-radius: 40px;
+      overflow: hidden;
+      border: 2px solid var(--border-color);
+      transition: all 0.3s;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    }
+    .screen-link:hover {
+      border-color: var(--accent-blue);
+      box-shadow: 0 25px 50px rgba(59, 94, 232, 0.2);
+      transform: translateY(-4px);
+    }
+    iframe {
+      width: 393px;
+      height: 852px;
+      border: none;
+      pointer-events: none;
+    }
+    iframe.landscape {
+      width: 852px;
+      height: 393px;
+    }
+    .screen-link.landscape {
+      border-radius: 40px;
+    }
+    .screen-item.landscape {
+      grid-column: span 2;
+    }
+    a { text-decoration: none; }
+  </style>
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body>
+  <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 8px;">
+    <img src="chore-robots-logo.png" alt="Chore Robots" style="height: 56px; object-fit: contain;">
+    <h1 style="margin-bottom: 0;">App</h1>
+  </div>
+  <p class="subtitle">13 Screens — Companion Control App for Chore Robot</p>
+
+  <div class="screen-grid">
+    <div class="screen-item">
+      <div class="screen-label">01 — Auth</div>
+      <a href="01-auth.html" class="screen-link"><iframe src="01-auth.html"></iframe></a>
+    </div>
+    <div class="screen-item">
+      <div class="screen-label">02a — BLE Scan</div>
+      <a href="02a-ble-scan.html" class="screen-link"><iframe src="02a-ble-scan.html"></iframe></a>
+    </div>
+    <div class="screen-item">
+      <div class="screen-label">02b — Pairing</div>
+      <a href="02-pairing.html" class="screen-link"><iframe src="02-pairing.html"></iframe></a>
+    </div>
+    <div class="screen-item">
+      <div class="screen-label">02c — Wi-Fi Setup</div>
+      <a href="02c-wifi-setup.html" class="screen-link"><iframe src="02c-wifi-setup.html"></iframe></a>
+    </div>
+    <div class="screen-item">
+      <div class="screen-label">02d — Setup Complete</div>
+      <a href="02d-setup-complete.html" class="screen-link"><iframe src="02d-setup-complete.html"></iframe></a>
+    </div>
+    <div class="screen-item">
+      <div class="screen-label">03 — Dashboard</div>
+      <a href="03-dashboard.html" class="screen-link"><iframe src="03-dashboard.html"></iframe></a>
+    </div>
+    <div class="screen-item landscape">
+      <div class="screen-label">04 — Control (Landscape)</div>
+      <a href="04-control.html" class="screen-link landscape"><iframe src="04-control.html" class="landscape"></iframe></a>
+    </div>
+    <div class="screen-item landscape">
+      <div class="screen-label">05 — Map / Boundary Training (Landscape)</div>
+      <a href="05-map.html" class="screen-link landscape"><iframe src="05-map.html" class="landscape"></iframe></a>
+    </div>
+    <div class="screen-item">
+      <div class="screen-label">06 — Battery</div>
+      <a href="06-battery.html" class="screen-link"><iframe src="06-battery.html"></iframe></a>
+    </div>
+    <div class="screen-item">
+      <div class="screen-label">07 — Diagnostics</div>
+      <a href="07-diagnostics.html" class="screen-link"><iframe src="07-diagnostics.html"></iframe></a>
+    </div>
+    <div class="screen-item">
+      <div class="screen-label">08 — Mowing Patterns</div>
+      <a href="08-mowing-patterns.html" class="screen-link"><iframe src="08-mowing-patterns.html"></iframe></a>
+    </div>
+    <div class="screen-item">
+      <div class="screen-label">09 — Snow Plowing</div>
+      <a href="09-snow-plowing.html" class="screen-link"><iframe src="09-snow-plowing.html"></iframe></a>
+    </div>
+    <div class="screen-item">
+      <div class="screen-label">10 — Leaf Collection</div>
+      <a href="10-leaf-collection.html" class="screen-link"><iframe src="10-leaf-collection.html"></iframe></a>
+    </div>
+  </div>
+</body>
+</html>

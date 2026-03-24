@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChoreRobotics — Setup Flow</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      background: #050608;
+      padding: 40px 20px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+    .header img { height: 48px; object-fit: contain; }
+    .header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 15px;
+      margin-bottom: 48px;
+    }
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 48px;
+      justify-content: center;
+    }
+    .screen-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .screen-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .screen-link {
+      display: block;
+      border-radius: 40px;
+      overflow: hidden;
+      border: 2px solid var(--border-color);
+      transition: all 0.3s;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    }
+    .screen-link:hover {
+      border-color: var(--accent-blue);
+      box-shadow: 0 25px 50px rgba(59, 94, 232, 0.2);
+      transform: translateY(-4px);
+    }
+    iframe {
+      width: 393px;
+      height: 852px;
+      border: none;
+      pointer-events: none;
+    }
+    a { text-decoration: none; }
+    .flow-arrow {
+      display: flex;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 32px;
+      padding-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="chore-robots-logo.png" alt="Chore Robots">
+    <h1>Setup Flow</h1>
+  </div>
+  <p class="subtitle">5 Screens — Onboarding & Robot Pairing</p>
+
+  <div class="flow">
+    <div class="screen-item">
+      <div class="screen-label">01 — Sign In</div>
+      <a href="01-auth.html" class="screen-link"><iframe src="01-auth.html"></iframe></a>
+    </div>
+
+    <div class="screen-item">
+      <div class="screen-label">02a — Find Robot</div>
+      <a href="02a-ble-scan.html" class="screen-link"><iframe src="02a-ble-scan.html"></iframe></a>
+    </div>
+
+    <div class="screen-item">
+      <div class="screen-label">02b — Pair Robot</div>
+      <a href="02-pairing.html" class="screen-link"><iframe src="02-pairing.html"></iframe></a>
+    </div>
+
+    <div class="screen-item">
+      <div class="screen-label">02c — Wi-Fi Setup</div>
+      <a href="02c-wifi-setup.html" class="screen-link"><iframe src="02c-wifi-setup.html"></iframe></a>
+    </div>
+
+    <div class="screen-item">
+      <div class="screen-label">02d — All Set</div>
+      <a href="02d-setup-complete.html" class="screen-link"><iframe src="02d-setup-complete.html"></iframe></a>
+    </div>
+  </div>
+</body>
+</html>

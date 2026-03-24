@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChoreRobotics — Setup Complete</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body style="background: #050608; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+
+<div class="phone-frame">
+  <div class="status-bar">
+    <span class="status-bar-left">9:41</span>
+    <div class="status-bar-right">
+      <span style="font-size: 13px;">100%</span>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor"><rect x="0" y="1" width="21" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1"/><rect x="22" y="3.5" width="2" height="5" rx="1"/><rect x="1.5" y="2.5" width="18" height="7" rx="1" fill="#3B5EE8"/></svg>
+    </div>
+  </div>
+
+  <!-- Steps — all done -->
+  <div style="padding-top: 12px;">
+    <div class="steps">
+      <div class="step-dot done">✓</div>
+      <div class="step-line done"></div>
+      <div class="step-dot done">✓</div>
+      <div class="step-line done"></div>
+      <div class="step-dot done">✓</div>
+      <div class="step-line done"></div>
+      <div class="step-dot done">✓</div>
+    </div>
+  </div>
+
+  <div class="content" style="padding-top: 8px;">
+    <div class="app-bar" style="padding: 0 0 12px;">
+      <div>
+        <div class="app-bar-title">All Set</div>
+        <div class="app-bar-subtitle">Your robot is ready to go</div>
+      </div>
+    </div>
+
+    <!-- Success Illustration -->
+    <div style="display: flex; flex-direction: column; align-items: center; padding: 24px 0 20px;">
+      <div style="position: relative; width: 100px; height: 100px;">
+        <div style="width: 100%; height: 100%; border-radius: 50%; background: var(--accent-blue-dim); display: flex; align-items: center; justify-content: center; border: 2px solid rgba(59, 94, 232, 0.15);">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Robot Summary Card -->
+    <div class="card" style="border-color: rgba(59, 94, 232, 0.12); background: linear-gradient(135deg, var(--bg-card), rgba(59, 94, 232, 0.04));">
+      <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+        <div style="width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <img src="robot-front.jpeg" alt="ChoreBot" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
+        <div style="flex: 1;">
+          <div style="font-size: 17px; font-weight: 700;">ChoreBot Alpha</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Paired and connected</div>
+        </div>
+      </div>
+
+      <div class="metric-row">
+        <span class="metric-label">Connection</span>
+        <span class="badge badge-blue" style="font-size: 10px; padding: 3px 10px;">Local Wi-Fi</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Network</span>
+        <span class="metric-value">HomeWiFi-5G</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Battery</span>
+        <span class="metric-value" style="color: var(--accent-blue);">100%</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Attachment</span>
+        <span class="metric-value">Mower Blade</span>
+      </div>
+    </div>
+
+    <!-- What's Next -->
+    <div class="card" style="margin-top: 4px;">
+      <div class="card-header">
+        <span class="card-title">What's Next</span>
+      </div>
+
+      <div style="display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+        <div style="width: 28px; height: 28px; border-radius: var(--radius-sm); background: var(--accent-blue-dim); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; font-weight: 700; color: var(--accent-blue);">1</div>
+        <div>
+          <div style="font-size: 14px; font-weight: 600;">Set up your yard</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Draw boundaries and zones on the map</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+        <div style="width: 28px; height: 28px; border-radius: var(--radius-sm); background: var(--accent-blue-dim); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; font-weight: 700; color: var(--accent-blue);">2</div>
+        <div>
+          <div style="font-size: 14px; font-weight: 600;">Choose a mowing pattern</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Pick stripes, diagonal, or let the robot decide</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; align-items: flex-start; padding: 10px 0;">
+        <div style="width: 28px; height: 28px; border-radius: var(--radius-sm); background: var(--accent-magenta-dim); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; font-weight: 700; color: var(--accent-magenta);">3</div>
+        <div>
+          <div style="font-size: 14px; font-weight: 600;">Start your first job</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Tap Start on the dashboard and watch it go</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div style="margin-top: 16px;">
+      <button class="btn btn-blue" style="font-size: 16px; padding: 16px;">Go to Dashboard</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

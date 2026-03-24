@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChoreRobotics — Map (Landscape)</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .landscape-frame {
+      width: 852px;
+      height: 393px;
+      background: var(--bg-primary);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      margin: 20px auto;
+      border-radius: 40px;
+      border: 2px solid var(--border-color);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+
+    .ls-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 24px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .ls-main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .ls-estop {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 280px;
+      height: 48px;
+      background: var(--accent-red);
+      border: 3px solid #FFD600;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 800;
+      color: white;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      box-shadow: 0 0 24px rgba(255, 59, 48, 0.5), 0 0 0 1px rgba(255, 214, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.4);
+      z-index: 100;
+    }
+  </style>
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body style="background: #050608; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+
+<div class="landscape-frame">
+  <!-- Top Bar -->
+  <div class="ls-top-bar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div class="connection-status">
+        <div class="connection-dot"></div>
+        <span class="connection-label">Local</span>
+      </div>
+      <span style="font-size: 14px; font-weight: 700;">Map Your Yard</span>
+    </div>
+
+    <!-- Zone selector -->
+    <div style="display: flex; gap: 4px;">
+      <button style="padding: 5px 12px; background: var(--accent-green-dim); border: 1.5px solid var(--accent-green); border-radius: var(--radius-sm); color: var(--accent-green); font-size: 11px; font-weight: 600; font-family: var(--font); cursor: pointer;">● Mow</button>
+      <button style="padding: 5px 12px; background: transparent; border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-muted); font-size: 11px; font-weight: 600; font-family: var(--font); cursor: pointer;">● Snow</button>
+      <button style="padding: 5px 12px; background: transparent; border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-muted); font-size: 11px; font-weight: 600; font-family: var(--font); cursor: pointer;">● Leaf</button>
+      <button style="padding: 5px 12px; background: transparent; border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-muted); font-size: 11px; font-weight: 600; font-family: var(--font); cursor: pointer;">✕ No-Go</button>
+    </div>
+
+    <div style="display: flex; gap: 6px;">
+      <button style="background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 5px 12px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 600; font-family: var(--font); cursor: pointer;">Undo</button>
+      <button style="background: var(--accent-blue); border: none; color: white; padding: 5px 12px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 600; font-family: var(--font); cursor: pointer;">Done</button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="ls-main">
+    <!-- Left: Joystick -->
+    <div style="flex: 0 0 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; border-right: 1px solid var(--border-color); gap: 10px;">
+      <div class="joystick-area" style="width: 150px; height: 150px;">
+        <div class="joystick-crosshair"></div>
+        <div class="joystick-thumb" style="width: 50px; height: 50px; transform: translate(0px, 0px);"></div>
+      </div>
+      <div style="font-size: 10px; color: var(--text-muted);">DRIVE ALONG BOUNDARY</div>
+      <!-- Pin Drop Button -->
+      <button style="width: 100%; padding: 10px; background: var(--accent-blue); border: none; border-radius: var(--radius-md); font-family: var(--font); font-size: 13px; font-weight: 700; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+        📍 Drop Pin
+      </button>
+    </div>
+
+    <!-- Center: Map Canvas -->
+    <div style="flex: 1; position: relative; background: var(--bg-surface); overflow: hidden;">
+      <!-- Grid -->
+      <svg width="100%" height="100%" style="position: absolute; inset: 0; opacity: 0.06;">
+        <defs>
+          <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+            <path d="M 30 0 L 0 0 0 30" fill="none" stroke="white" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#grid)"/>
+      </svg>
+
+      <!-- Zones -->
+      <svg width="100%" height="100%" style="position: absolute; inset: 0;" viewBox="0 0 600 340">
+        <!-- Mow Zone (green) — large area -->
+        <polygon points="40,30 520,20 540,180 480,290 60,300 30,200"
+          fill="rgba(0, 200, 83, 0.08)" stroke="#00C853" stroke-width="2" stroke-dasharray="6,3"/>
+        <text x="280" y="155" fill="#3B5EE8" font-size="13" font-weight="600" font-family="Inter, sans-serif" text-anchor="middle" opacity="0.6">MOW ZONE 1 — 142 m²</text>
+
+        <!-- Snow Zone (blue) — driveway area -->
+        <polygon points="40,305 480,295 490,330 35,335"
+          fill="rgba(59, 94, 232, 0.08)" stroke="#3B5EE8" stroke-width="2" stroke-dasharray="6,3"/>
+        <text x="260" y="322" fill="#3B5EE8" font-size="10" font-weight="600" font-family="Inter, sans-serif" text-anchor="middle" opacity="0.5">SNOW — DRIVEWAY</text>
+
+        <!-- No-Go Zone (red, hatched) -->
+        <polygon points="180,80 290,75 295,160 175,165"
+          fill="rgba(255, 59, 48, 0.12)" stroke="#FF3B30" stroke-width="2"/>
+        <defs>
+          <pattern id="hatch" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="8" stroke="#FF3B30" stroke-width="1" opacity="0.3"/>
+          </pattern>
+        </defs>
+        <polygon points="180,80 290,75 295,160 175,165" fill="url(#hatch)"/>
+        <text x="235" y="125" fill="#FF3B30" font-size="11" font-weight="600" font-family="Inter, sans-serif" text-anchor="middle" opacity="0.7">NO-GO</text>
+        <text x="235" y="138" fill="#FF3B30" font-size="9" font-family="Inter, sans-serif" text-anchor="middle" opacity="0.5">Flower Bed</text>
+
+        <!-- Leaf Zone (orange) -->
+        <polygon points="380,180 520,175 525,270 385,275"
+          fill="rgba(255, 109, 0, 0.08)" stroke="#FF6D00" stroke-width="2" stroke-dasharray="6,3"/>
+        <text x="452" y="230" fill="#FF6D00" font-size="10" font-weight="600" font-family="Inter, sans-serif" text-anchor="middle" opacity="0.6">LEAF — Under Oak</text>
+
+        <!-- Vertex pins on mow zone -->
+        <circle cx="40" cy="30" r="5" fill="#3B5EE8" stroke="white" stroke-width="2"/>
+        <circle cx="520" cy="20" r="5" fill="#3B5EE8" stroke="white" stroke-width="2"/>
+        <circle cx="540" cy="180" r="5" fill="#3B5EE8" stroke="white" stroke-width="2"/>
+        <circle cx="480" cy="290" r="5" fill="#3B5EE8" stroke="white" stroke-width="2"/>
+        <circle cx="60" cy="300" r="5" fill="#3B5EE8" stroke="white" stroke-width="2"/>
+        <circle cx="30" cy="200" r="5" fill="#3B5EE8" stroke="white" stroke-width="2"/>
+
+        <!-- No-Go vertices -->
+        <circle cx="180" cy="80" r="4" fill="#FF3B30" stroke="white" stroke-width="1.5"/>
+        <circle cx="290" cy="75" r="4" fill="#FF3B30" stroke="white" stroke-width="1.5"/>
+        <circle cx="295" cy="160" r="4" fill="#FF3B30" stroke="white" stroke-width="1.5"/>
+        <circle cx="175" cy="165" r="4" fill="#FF3B30" stroke="white" stroke-width="1.5"/>
+
+        <!-- Dock -->
+        <rect x="255" y="270" width="26" height="18" rx="3" fill="var(--accent-blue)" opacity="0.8"/>
+        <text x="268" y="282" fill="white" font-size="9" font-weight="700" font-family="Inter, sans-serif" text-anchor="middle">⌂</text>
+
+        <!-- Robot current position (being driven) -->
+        <circle cx="120" cy="240" r="8" fill="var(--accent-blue)" opacity="0.25">
+          <animate attributeName="r" values="8;14;8" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.25;0.08;0.25" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="120" cy="240" r="5" fill="var(--accent-blue)"/>
+        <!-- Robot trail (where it's been driven for boundary) -->
+        <polyline points="60,300 70,280 90,260 110,245 120,240"
+          fill="none" stroke="var(--accent-blue)" stroke-width="2" stroke-dasharray="3,3" opacity="0.5"/>
+      </svg>
+
+      <!-- Scale indicator -->
+      <div style="position: absolute; bottom: 10px; right: 12px; display: flex; align-items: center; gap: 4px;">
+        <div style="width: 40px; height: 2px; background: var(--text-muted);"></div>
+        <span style="font-size: 9px; color: var(--text-muted); font-family: var(--font-mono);">5m</span>
+      </div>
+
+      <!-- Zone info overlay -->
+      <div style="position: absolute; top: 10px; right: 12px; background: rgba(8, 10, 14, 0.85); padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+        <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 4px;">Zones Defined</div>
+        <div style="display: flex; gap: 10px;">
+          <span style="font-size: 10px; color: var(--accent-green);">● Mow: 1</span>
+          <span style="font-size: 10px; color: var(--accent-blue);">● Snow: 1</span>
+          <span style="font-size: 10px; color: var(--accent-orange);">● Leaf: 1</span>
+          <span style="font-size: 10px; color: var(--accent-red);">✕ No-Go: 1</span>
+        </div>
+      </div>
+
+      <!-- Current action hint -->
+      <div style="position: absolute; bottom: 10px; left: 12px; background: rgba(8, 10, 14, 0.85); padding: 6px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+        <span style="font-size: 10px; color: var(--accent-green);">● Drawing Mow Zone — 5 pins placed</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- E-Stop -->
+  <div class="ls-estop">
+    <div class="estop-pulse"></div>
+    EMERGENCY STOP
+  </div>
+</div>
+
+</body>
+</html>

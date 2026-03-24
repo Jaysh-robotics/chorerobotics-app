@@ -1,0 +1,38 @@
+name: chorerobotics
+description: ChoreRobotics — Autonomous outdoor robot companion app
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management (BLoC)
+  flutter_bloc: ^9.1.0
+  equatable: ^2.0.7
+
+  # Navigation
+  go_router: ^17.0.1
+
+  # UI
+  google_fonts: ^7.0.0
+  flutter_animate: ^4.5.2
+  phosphor_flutter: ^2.1.0
+  smooth_page_indicator: ^1.2.1
+
+  # Utils
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/logo/

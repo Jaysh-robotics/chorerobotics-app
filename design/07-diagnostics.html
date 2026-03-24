@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChoreRobotics — Diagnostics</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body style="background: #050608; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+
+<div class="phone-frame">
+  <div class="status-bar">
+    <span class="status-bar-left">9:41</span>
+    <div class="status-bar-right">
+      <span style="font-size: 13px;">78%</span>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor"><rect x="0" y="1" width="21" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1"/><rect x="22" y="3.5" width="2" height="5" rx="1"/><rect x="1.5" y="2.5" width="14" height="7" rx="1" fill="#3B5EE8"/></svg>
+    </div>
+  </div>
+
+  <div class="brand-line"></div>
+  <div class="connection-bar">
+    <div class="connection-status">
+      <div class="connection-dot"></div>
+      <span class="connection-label">Local</span>
+    </div>
+    <div class="connection-battery">
+      <span class="badge badge-purple" style="font-size: 10px; padding: 2px 8px;">NOMINAL</span>
+    </div>
+  </div>
+
+  <div class="app-bar">
+    <div>
+      <div class="app-bar-title">Diagnostics</div>
+      <div class="app-bar-subtitle">System Health & Logs</div>
+    </div>
+    <div class="app-bar-actions">
+      <button class="icon-btn" style="font-size: 13px; width: auto; padding: 0 12px; gap: 4px; display: flex;">
+        <span>📤</span>
+        <span style="font-size: 11px;">Export</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Tabs — Overview is default for homeowners -->
+    <div class="toggle-group" style="margin-bottom: 16px;">
+      <div class="toggle-opt active">Overview</div>
+      <div class="toggle-opt">Technical</div>
+      <div class="toggle-opt">Faults</div>
+    </div>
+
+    <!-- System Health Summary -->
+    <div class="card" style="border-color: rgba(59, 94, 232, 0.15);">
+      <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+        <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: var(--accent-blue-dim); display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--accent-blue); font-weight: 800;">&#10003;</div>
+        <div>
+          <div style="font-size: 18px; font-weight: 700;">All Systems Normal</div>
+          <div style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Last checked just now</div>
+        </div>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Motors</span>
+        <span class="metric-value" style="color: var(--accent-blue);">Normal</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Blade</span>
+        <span class="metric-value" style="color: var(--text-muted);">Standby</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Battery Health</span>
+        <span class="metric-value" style="color: var(--accent-purple);">94%</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Temperature</span>
+        <span class="metric-value">Normal</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Connection</span>
+        <span class="metric-value" style="color: var(--accent-blue);">Strong</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Data Link</span>
+        <span class="metric-value" style="color: var(--accent-blue);">Active</span>
+      </div>
+    </div>
+
+    <!-- Recent Alerts -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Recent Alerts</span>
+        <span style="font-size: 11px; color: var(--text-muted);">Last 24h</span>
+      </div>
+      <div class="log-entry">
+        <div class="log-severity" style="background: var(--accent-yellow);"></div>
+        <div style="flex: 1;">
+          <div class="log-text">Wi-Fi signal dropped briefly</div>
+          <div class="log-time">3 hours ago</div>
+        </div>
+      </div>
+      <div class="log-entry">
+        <div class="log-severity" style="background: var(--accent-red);"></div>
+        <div style="flex: 1;">
+          <div class="log-text">Emergency stop activated by user</div>
+          <div class="log-time">4 hours ago</div>
+        </div>
+      </div>
+      <div class="log-entry">
+        <div class="log-severity" style="background: var(--accent-blue);"></div>
+        <div style="flex: 1;">
+          <div class="log-text">Emergency stop recovered — all checks passed</div>
+          <div class="log-time">4 hours ago</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- E-Stop -->
+  <div class="estop-float">
+    <div class="estop-pulse"></div>
+    EMERGENCY STOP
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item">
+      <span class="nav-icon">⊞</span>
+      <span>Home</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">◎</span>
+      <span>Control</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">◫</span>
+      <span>Map</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">⚡</span>
+      <span>Battery</span>
+    </div>
+    <div class="nav-item active">
+      <span class="nav-icon">≡</span>
+      <span>More</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

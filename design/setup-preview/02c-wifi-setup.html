@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChoreRobotics — Wi-Fi Setup</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body style="background: #050608; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+
+<div class="phone-frame">
+  <div class="status-bar">
+    <span class="status-bar-left">9:41</span>
+    <div class="status-bar-right">
+      <span style="font-size: 13px;">100%</span>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor"><rect x="0" y="1" width="21" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1"/><rect x="22" y="3.5" width="2" height="5" rx="1"/><rect x="1.5" y="2.5" width="18" height="7" rx="1" fill="#3B5EE8"/></svg>
+    </div>
+  </div>
+
+  <!-- Steps -->
+  <div style="padding-top: 12px;">
+    <div class="steps">
+      <div class="step-dot done">✓</div>
+      <div class="step-line done"></div>
+      <div class="step-dot done">✓</div>
+      <div class="step-line done"></div>
+      <div class="step-dot active">3</div>
+      <div class="step-line"></div>
+      <div class="step-dot">4</div>
+    </div>
+  </div>
+
+  <div class="content" style="padding-top: 8px;">
+    <div class="app-bar" style="padding: 0 0 20px;">
+      <div>
+        <div class="app-bar-title">Connect to Wi-Fi</div>
+        <div class="app-bar-subtitle">Add your robot to your home network</div>
+      </div>
+    </div>
+
+    <!-- Pairing Success Banner -->
+    <div style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--accent-blue-dim); border-radius: var(--radius-md); margin-bottom: 16px; border: 1px solid rgba(59, 94, 232, 0.10);">
+      <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--accent-blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <span style="font-size: 13px; font-weight: 600; color: var(--accent-blue);">Paired securely with ChoreBot Alpha</span>
+    </div>
+
+    <!-- Why Connect -->
+    <div class="card">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--accent-blue-dim); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2" stroke-linecap="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+        </div>
+        <div>
+          <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">Why connect to Wi-Fi?</div>
+          <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin: 0;">
+            Wi-Fi gives you the best experience — faster response, cloud features, and automatic updates. You can always use direct connection as a backup.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Network Picker -->
+    <div class="card" style="margin-top: 4px;">
+      <div class="card-header">
+        <span class="card-title">Available Networks</span>
+        <span style="font-size: 11px; color: var(--text-muted);">3 found</span>
+      </div>
+
+      <!-- Network 1 — selected -->
+      <div style="display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border-color);">
+        <div style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--accent-blue); display: flex; align-items: center; justify-content: center;">
+          <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--accent-blue);"></div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+        <div style="flex: 1;">
+          <div style="font-size: 14px; font-weight: 600;">HomeWiFi-5G</div>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+
+      <!-- Network 2 -->
+      <div style="display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border-color);">
+        <div style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border-color);"></div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+        <div style="flex: 1;">
+          <div style="font-size: 14px; color: var(--text-secondary);">HomeWiFi-2.4G</div>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+
+      <!-- Network 3 -->
+      <div style="display: flex; align-items: center; gap: 12px; padding: 14px 0;">
+        <div style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border-color);"></div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round"><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+        <div style="flex: 1;">
+          <div style="font-size: 14px; color: var(--text-muted);">Neighbor_Net</div>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+    </div>
+
+    <!-- Password Field -->
+    <div class="card" style="margin-top: 4px;">
+      <div class="input-group" style="margin-bottom: 0;">
+        <label class="input-label">Password for HomeWiFi-5G</label>
+        <div style="position: relative;">
+          <input type="password" class="input-field" placeholder="Enter Wi-Fi password" value="••••••••••" style="padding-right: 48px;">
+          <button style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 12px; font-family: var(--font); font-weight: 500;">Show</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connect Button -->
+    <div style="margin-top: 16px;">
+      <button class="btn btn-blue" style="font-size: 16px; padding: 16px;">Connect Robot to Wi-Fi</button>
+    </div>
+
+    <div style="text-align: center; margin-top: 16px;">
+      <a href="#" style="font-size: 13px; color: var(--text-muted); text-decoration: none;">Skip — use direct connection only</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

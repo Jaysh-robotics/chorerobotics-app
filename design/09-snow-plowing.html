@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChoreRobotics — Snow Plowing</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body style="background: #050608; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+
+<div class="phone-frame">
+  <div class="status-bar">
+    <span class="status-bar-left">9:41</span>
+    <div class="status-bar-right">
+      <span style="font-size: 13px;">85%</span>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor"><rect x="0" y="1" width="21" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1"/><rect x="22" y="3.5" width="2" height="5" rx="1"/><rect x="1.5" y="2.5" width="16" height="7" rx="1" fill="#3B5EE8"/></svg>
+    </div>
+  </div>
+
+  <div class="brand-line"></div>
+  <div class="connection-bar">
+    <div class="connection-status">
+      <div class="connection-dot"></div>
+      <span class="connection-label">Local</span>
+    </div>
+    <div class="connection-battery">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent-blue)"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      <span style="color: var(--accent-blue);">85%</span>
+    </div>
+  </div>
+
+  <div class="app-bar">
+    <div>
+      <div class="app-bar-title">Snow Plowing</div>
+      <div class="app-bar-subtitle">Driveway — 38 m²</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Attachment Check -->
+    <div class="card" style="padding: 12px 16px; display: flex; align-items: center; gap: 12px; border-color: rgba(59, 94, 232, 0.2);">
+      <div style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <img src="robot-rear-quarter.jpeg" alt="ChoreBot" style="width: 100%; height: 100%; object-fit: contain;">
+      </div>
+      <div style="flex: 1;">
+        <div style="font-size: 14px; font-weight: 600;">Snow Plow Attached</div>
+        <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">ATT-2C4D-6E8F</div>
+      </div>
+      <span class="badge badge-blue">● Ready</span>
+    </div>
+
+    <!-- Start From -->
+    <div style="margin-top: 12px;">
+      <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">Start From</div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div class="card" style="padding: 14px 16px; display: flex; align-items: center; gap: 12px; border-color: var(--accent-blue); background: var(--accent-blue-dim); cursor: pointer; margin-bottom: 0;">
+          <div style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--accent-blue); display: flex; align-items: center; justify-content: center;">
+            <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--accent-blue);"></div>
+          </div>
+          <div>
+            <div style="font-size: 14px; font-weight: 600;">Driveway Entrance</div>
+            <div style="font-size: 11px; color: var(--text-secondary);">Pushes snow toward back/sides</div>
+          </div>
+        </div>
+        <div class="card" style="padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 0;">
+          <div style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border-active);"></div>
+          <div>
+            <div style="font-size: 14px; font-weight: 600;">Garage Door</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Pushes snow toward the street</div>
+          </div>
+        </div>
+        <div class="card" style="padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 0;">
+          <div style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border-active);"></div>
+          <div>
+            <div style="font-size: 14px; font-weight: 600;">Center</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Pushes snow to both sides</div>
+          </div>
+        </div>
+        <div class="card" style="padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 0;">
+          <div style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border-active);"></div>
+          <div>
+            <div style="font-size: 14px; font-weight: 600;">Custom Point</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Tap on map to pick start</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Snow Depth -->
+    <div style="margin-top: 16px;">
+      <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">Snow Depth</div>
+      <div class="toggle-group">
+        <div class="toggle-opt active">
+          <div style="font-weight: 700;">Light</div>
+          <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">&lt; 5cm</div>
+        </div>
+        <div class="toggle-opt">
+          <div style="font-weight: 700;">Medium</div>
+          <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">5-15cm</div>
+        </div>
+        <div class="toggle-opt">
+          <div style="font-weight: 700;">Heavy</div>
+          <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">&gt; 15cm</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Push Direction -->
+    <div style="margin-top: 16px;">
+      <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">Snow Disposal</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+        <div class="card" style="padding: 12px 8px; text-align: center; cursor: pointer; border-color: var(--accent-blue); background: var(--accent-blue-dim); margin-bottom: 0;">
+          <div style="font-size: 20px; margin-bottom: 4px;">←</div>
+          <div style="font-size: 11px; font-weight: 600; color: var(--accent-blue);">Push Left</div>
+        </div>
+        <div class="card" style="padding: 12px 8px; text-align: center; cursor: pointer; margin-bottom: 0;">
+          <div style="font-size: 20px; margin-bottom: 4px;">→</div>
+          <div style="font-size: 11px; font-weight: 600;">Push Right</div>
+        </div>
+        <div class="card" style="padding: 12px 8px; text-align: center; cursor: pointer; margin-bottom: 0;">
+          <div style="font-size: 20px; margin-bottom: 4px;">📍</div>
+          <div style="font-size: 11px; font-weight: 600;">Pile Zone</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estimate -->
+    <div class="card" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; margin-top: 12px;">
+      <div>
+        <div style="font-size: 13px; color: var(--text-muted);">Estimated Time</div>
+        <div style="font-size: 20px; font-weight: 700; margin-top: 2px;">25 min</div>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 13px; color: var(--text-muted);">Passes</div>
+        <div style="font-size: 20px; font-weight: 700; color: var(--accent-blue); margin-top: 2px;">1 pass</div>
+      </div>
+    </div>
+
+    <!-- Start -->
+    <button class="btn btn-blue" style="font-size: 16px; padding: 18px; margin-top: 8px;">
+      <span style="font-size: 18px;">❄</span>
+      Start Plowing
+    </button>
+  </div>
+
+  <!-- E-Stop -->
+  <div class="estop-float">
+    <div class="estop-pulse"></div>
+    EMERGENCY STOP
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <span class="nav-icon">⊞</span>
+      <span>Home</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">◎</span>
+      <span>Control</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">◫</span>
+      <span>Map</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">⚡</span>
+      <span>Battery</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">≡</span>
+      <span>More</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

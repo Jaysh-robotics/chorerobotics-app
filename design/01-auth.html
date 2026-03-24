@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChoreRobotics — Auth</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body style="background: #050608; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+
+<div class="phone-frame">
+  <div class="status-bar">
+    <span class="status-bar-left">9:41</span>
+    <div class="status-bar-right">
+      <svg width="16" height="12" fill="currentColor"><rect x="0" y="6" width="3" height="6" rx="1"/><rect x="4.5" y="4" width="3" height="8" rx="1"/><rect x="9" y="2" width="3" height="10" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 3.5C9.8 3.5 11.4 4.2 12.6 5.3L14 3.9C12.4 2.4 10.3 1.5 8 1.5C5.7 1.5 3.6 2.4 2 3.9L3.4 5.3C4.6 4.2 6.2 3.5 8 3.5Z"/><path d="M8 7C9 7 9.9 7.4 10.6 8L12 6.6C10.9 5.6 9.5 5 8 5C6.5 5 5.1 5.6 4 6.6L5.4 8C6.1 7.4 7 7 8 7Z"/><circle cx="8" cy="10.5" r="1.5"/></svg>
+      <span style="font-size: 13px;">100%</span>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor"><rect x="0" y="1" width="21" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1"/><rect x="22" y="3.5" width="2" height="5" rx="1"/><rect x="1.5" y="2.5" width="18" height="7" rx="1" fill="#3B5EE8"/></svg>
+    </div>
+  </div>
+
+  <div class="content" style="display: flex; flex-direction: column; justify-content: center; padding: 0 28px 0;">
+    <!-- Logo Area -->
+    <div style="text-align: center; margin-bottom: 48px;">
+      <div style="width: 180px; height: 124px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center;">
+        <img src="chore-robots-logo.png" alt="Chore Robots" style="width: 100%; height: 100%; object-fit: contain;">
+      </div>
+      <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-top: 4px;">Autonomous lawn care,<br>snow clearing & more</p>
+    </div>
+
+    <!-- Sign In Form -->
+    <div class="input-group">
+      <label class="input-label">Email</label>
+      <input type="email" class="input-field" placeholder="you@example.com" value="jay@chorerobotics.com">
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">Password</label>
+      <input type="password" class="input-field" placeholder="Enter password" value="••••••••••">
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); cursor: pointer;">
+        <div style="width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--accent-blue); background: var(--accent-blue-dim); display: flex; align-items: center; justify-content: center;">
+          <svg width="10" height="10" fill="var(--accent-blue)" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </div>
+        Remember me
+      </label>
+      <a href="#" style="font-size: 13px; color: var(--accent-blue); text-decoration: none; font-weight: 500;">Forgot password?</a>
+    </div>
+
+    <button class="btn btn-blue" style="margin-bottom: 12px; font-size: 16px; padding: 16px;">Sign In</button>
+
+    <button class="btn btn-outline" style="margin-bottom: 32px;">Create Account</button>
+
+    <div style="text-align: center;">
+      <a href="#" style="font-size: 13px; color: var(--text-muted); text-decoration: none;">Continue as Guest</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChoreRobotics — Mowing Patterns</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body style="background: #050608; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+
+<div class="phone-frame">
+  <div class="status-bar">
+    <span class="status-bar-left">9:41</span>
+    <div class="status-bar-right">
+      <span style="font-size: 13px;">78%</span>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor"><rect x="0" y="1" width="21" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1"/><rect x="22" y="3.5" width="2" height="5" rx="1"/><rect x="1.5" y="2.5" width="14" height="7" rx="1" fill="#3B5EE8"/></svg>
+    </div>
+  </div>
+
+  <div class="brand-line"></div>
+  <div class="connection-bar">
+    <div class="connection-status">
+      <div class="connection-dot"></div>
+      <span class="connection-label">Local</span>
+    </div>
+    <div class="connection-battery">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent-blue)"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      <span style="color: var(--accent-blue);">78%</span>
+    </div>
+  </div>
+
+  <div class="app-bar">
+    <div>
+      <div class="app-bar-title">Start Mowing</div>
+      <div class="app-bar-subtitle">Mow Zone 1 — Front Yard</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Zone Summary -->
+    <div class="card" style="padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <img src="robot-top.jpeg" alt="ChoreBot" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
+        <div>
+          <div style="font-size: 14px; font-weight: 600;">Front Yard</div>
+          <div style="font-size: 12px; color: var(--text-muted);">142 m² — 1 no-go zone</div>
+        </div>
+      </div>
+      <span class="badge badge-blue">Ready</span>
+    </div>
+
+    <!-- Pattern Selection -->
+    <div style="margin-top: 4px;">
+      <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">Stripe Pattern</div>
+      <div class="pattern-grid">
+        <!-- Straight Stripes -->
+        <div class="pattern-card active">
+          <div class="pattern-preview">
+            <svg width="80" height="60" viewBox="0 0 80 60">
+              <line x1="10" y1="0" x2="10" y2="60" stroke="#3B5EE8" stroke-width="2" opacity="0.6"/>
+              <line x1="25" y1="0" x2="25" y2="60" stroke="#8B45B5" stroke-width="2" opacity="0.5"/>
+              <line x1="40" y1="0" x2="40" y2="60" stroke="#3B5EE8" stroke-width="2" opacity="0.6"/>
+              <line x1="55" y1="0" x2="55" y2="60" stroke="#8B45B5" stroke-width="2" opacity="0.5"/>
+              <line x1="70" y1="0" x2="70" y2="60" stroke="#3B5EE8" stroke-width="2" opacity="0.6"/>
+            </svg>
+          </div>
+          <div class="pattern-name" style="color: var(--accent-purple);">Straight</div>
+        </div>
+
+        <!-- Diagonal Stripes -->
+        <div class="pattern-card">
+          <div class="pattern-preview">
+            <svg width="80" height="60" viewBox="0 0 80 60">
+              <line x1="0" y1="15" x2="45" y2="60" stroke="#3B5EE8" stroke-width="2" opacity="0.6"/>
+              <line x1="0" y1="0" x2="60" y2="60" stroke="#8B45B5" stroke-width="2" opacity="0.5"/>
+              <line x1="20" y1="0" x2="80" y2="60" stroke="#3B5EE8" stroke-width="2" opacity="0.6"/>
+              <line x1="35" y1="0" x2="80" y2="45" stroke="#8B45B5" stroke-width="2" opacity="0.5"/>
+              <line x1="50" y1="0" x2="80" y2="30" stroke="#3B5EE8" stroke-width="2" opacity="0.6"/>
+            </svg>
+          </div>
+          <div class="pattern-name">Diagonal</div>
+        </div>
+
+        <!-- Checkerboard -->
+        <div class="pattern-card">
+          <div class="pattern-preview">
+            <svg width="80" height="60" viewBox="0 0 80 60">
+              <line x1="10" y1="0" x2="10" y2="60" stroke="#3B5EE8" stroke-width="1.5" opacity="0.5"/>
+              <line x1="25" y1="0" x2="25" y2="60" stroke="#8B45B5" stroke-width="1.5" opacity="0.4"/>
+              <line x1="40" y1="0" x2="40" y2="60" stroke="#3B5EE8" stroke-width="1.5" opacity="0.5"/>
+              <line x1="55" y1="0" x2="55" y2="60" stroke="#8B45B5" stroke-width="1.5" opacity="0.4"/>
+              <line x1="70" y1="0" x2="70" y2="60" stroke="#3B5EE8" stroke-width="1.5" opacity="0.5"/>
+              <line x1="0" y1="10" x2="80" y2="10" stroke="#8B45B5" stroke-width="1.5" opacity="0.4"/>
+              <line x1="0" y1="25" x2="80" y2="25" stroke="#3B5EE8" stroke-width="1.5" opacity="0.5"/>
+              <line x1="0" y1="40" x2="80" y2="40" stroke="#8B45B5" stroke-width="1.5" opacity="0.4"/>
+              <line x1="0" y1="55" x2="80" y2="55" stroke="#3B5EE8" stroke-width="1.5" opacity="0.5"/>
+            </svg>
+          </div>
+          <div class="pattern-name">Checker</div>
+          <div style="font-size: 10px; color: var(--accent-pink); margin-top: 2px;">2x time</div>
+        </div>
+
+        <!-- Spiral -->
+        <div class="pattern-card">
+          <div class="pattern-preview">
+            <svg width="80" height="60" viewBox="0 0 80 60">
+              <rect x="5" y="5" width="70" height="50" fill="none" stroke="#3B5EE8" stroke-width="1.5" rx="2" opacity="0.5"/>
+              <rect x="12" y="12" width="56" height="36" fill="none" stroke="#8B45B5" stroke-width="1.5" rx="2" opacity="0.4"/>
+              <rect x="19" y="19" width="42" height="22" fill="none" stroke="#D63384" stroke-width="1.5" rx="2" opacity="0.4"/>
+              <rect x="26" y="24" width="28" height="12" fill="none" stroke="#EF3350" stroke-width="1.5" rx="2" opacity="0.3"/>
+            </svg>
+          </div>
+          <div class="pattern-name">Spiral</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Angle Slider -->
+    <div class="card">
+      <div class="slider-container">
+        <div class="slider-header">
+          <span class="slider-label">Stripe Angle</span>
+          <span class="slider-value">45°</span>
+        </div>
+        <input type="range" class="slider" min="0" max="180" value="45">
+        <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+          <span style="font-size: 10px; color: var(--text-muted);">0° (N-S)</span>
+          <span style="font-size: 10px; color: var(--text-muted);">90° (E-W)</span>
+          <span style="font-size: 10px; color: var(--text-muted);">180°</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlap Slider -->
+    <div class="card">
+      <div class="slider-container">
+        <div class="slider-header">
+          <span class="slider-label">Pass Overlap</span>
+          <span class="slider-value">10%</span>
+        </div>
+        <input type="range" class="slider" min="0" max="30" value="10">
+        <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+          <span style="font-size: 10px; color: var(--text-muted);">0% (fastest)</span>
+          <span style="font-size: 10px; color: var(--text-muted);">30% (cleanest)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estimated Time -->
+    <div class="card" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px;">
+      <div>
+        <div style="font-size: 13px; color: var(--text-muted);">Estimated Time</div>
+        <div style="font-size: 20px; font-weight: 700; margin-top: 2px;">1h 20m</div>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 13px; color: var(--text-muted);">Battery Needed</div>
+        <div style="font-size: 20px; font-weight: 700; color: var(--accent-purple); margin-top: 2px;">~58%</div>
+      </div>
+    </div>
+
+    <!-- Start Button -->
+    <button class="btn btn-blue" style="font-size: 16px; padding: 18px; margin-top: 4px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      Start Mowing
+    </button>
+  </div>
+
+  <!-- E-Stop -->
+  <div class="estop-float">
+    <div class="estop-pulse"></div>
+    EMERGENCY STOP
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <span class="nav-icon">⊞</span>
+      <span>Home</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">◎</span>
+      <span>Control</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">◫</span>
+      <span>Map</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">⚡</span>
+      <span>Battery</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">≡</span>
+      <span>More</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
