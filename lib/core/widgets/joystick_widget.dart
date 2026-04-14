@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
+/// Joystick with displacement-proportional speed.
+/// Output: normalized Offset (-1 to +1) where MAGNITUDE = speed factor.
+/// - Center (0,0) = stopped
+/// - Edge (1.0 magnitude) = max speed
+/// - Intermediate = proportional speed (e.g., 0.5 = 50% speed)
+///
+/// The [deadzone] parameter (0.0-1.0) ignores small movements near center.
+/// Default 0.1 = 10% of radius is treated as zero (prevents drift).
 class JoystickWidget extends StatefulWidget {
   final double size;
   final ValueChanged<Offset>? onChanged;
+  /// Called with speed magnitude (0.0 to 1.0) and angle in radians
+  final void Function(double speed, double angle)? onSpeedChanged;
   final String? label;
+  /// Dead zone radius as fraction of max (0.0-1.0). Default 0.1
+  final double deadzone;
 
-  const JoystickWidget({super.key, this.size = 160, this.onChanged, this.label});
+  const JoystickWidget({super.key, this.size = 160, this.onChanged, this.onSpeedChanged, this.label, this.deadzone = 0.1});
 
   @override
   State<JoystickWidget> createState() => _JoystickWidgetState();
@@ -29,6 +41,7 @@ class _JoystickWidgetState extends State<JoystickWidget> with SingleTickerProvid
     _springController.addListener(() {
       setState(() => _thumbOffset = _springAnimation.value);
       widget.onChanged?.call(_normalize(_thumbOffset));
+      widget.onSpeedChanged?.call(_speedFromOffset(_thumbOffset), _angleFromOffset(_thumbOffset));
     });
   }
 
@@ -39,10 +52,26 @@ class _JoystickWidgetState extends State<JoystickWidget> with SingleTickerProvid
   }
 
   Offset _normalize(Offset offset) {
-    return Offset(
+    final raw = Offset(
       (offset.dx / _maxRadius).clamp(-1.0, 1.0),
       (offset.dy / _maxRadius).clamp(-1.0, 1.0),
     );
+    // Apply deadzone — if magnitude < deadzone, treat as zero
+    if (raw.distance < widget.deadzone) return Offset.zero;
+    return raw;
+  }
+
+  /// Speed magnitude (0.0 to 1.0) based on distance from center
+  double _speedFromOffset(Offset offset) {
+    final normalized = _normalize(offset);
+    return normalized.distance.clamp(0.0, 1.0);
+  }
+
+  /// Angle in radians from center
+  double _angleFromOffset(Offset offset) {
+    final normalized = _normalize(offset);
+    if (normalized == Offset.zero) return 0;
+    return normalized.direction; // radians, -pi to pi
   }
 
   Offset _clampToCircle(Offset offset) {
@@ -61,7 +90,9 @@ class _JoystickWidgetState extends State<JoystickWidget> with SingleTickerProvid
             setState(() {
               _thumbOffset = _clampToCircle(_thumbOffset + details.delta);
             });
-            widget.onChanged?.call(_normalize(_thumbOffset));
+            final norm = _normalize(_thumbOffset);
+            widget.onChanged?.call(norm);
+            widget.onSpeedChanged?.call(_speedFromOffset(_thumbOffset), _angleFromOffset(_thumbOffset));
           },
           onPanEnd: (_) {
             _springAnimation = Tween<Offset>(begin: _thumbOffset, end: Offset.zero).animate(

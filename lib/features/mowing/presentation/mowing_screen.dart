@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/connection_bar.dart';
+import '../../active_task/bloc/active_task_bloc.dart';
 import '../../../core/widgets/brand_card.dart';
 import '../../../core/widgets/brand_badge.dart';
 
@@ -17,6 +20,27 @@ class _MowingScreenState extends State<MowingScreen> {
   int _selectedPattern = 0;
   double _angle = 45;
   double _overlap = 10;
+
+  void _simulateProgress(BuildContext ctx) {
+    // Demo: simulate progress ticking up, then get "stuck" at 65%
+    final bloc = ctx.read<ActiveTaskBloc>();
+    Future.delayed(const Duration(seconds: 2), () {
+      if (!ctx.mounted) return;
+      bloc.add(const TaskProgressUpdated(completedAreaSqM: 28, progressPercent: 20, batteryUsed: 8, elapsedSeconds: 120));
+    });
+    Future.delayed(const Duration(seconds: 4), () {
+      if (!ctx.mounted) return;
+      bloc.add(const TaskProgressUpdated(completedAreaSqM: 56, progressPercent: 40, batteryUsed: 16, elapsedSeconds: 240));
+    });
+    Future.delayed(const Duration(seconds: 6), () {
+      if (!ctx.mounted) return;
+      bloc.add(const TaskProgressUpdated(completedAreaSqM: 92, progressPercent: 65, batteryUsed: 28, elapsedSeconds: 420));
+    });
+    Future.delayed(const Duration(seconds: 8), () {
+      if (!ctx.mounted) return;
+      bloc.add(const TaskFailed('stuck'));
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -170,7 +194,19 @@ class _MowingScreenState extends State<MowingScreen> {
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () {
+                          context.read<ActiveTaskBloc>().add(const TaskStarted(
+                            taskId: 'task_001',
+                            taskType: 'mow',
+                            zoneId: 'zone_1',
+                            zoneName: 'Front Yard',
+                            totalAreaSqM: 142,
+                          ));
+                          // Simulate progress updates
+                          _simulateProgress(context);
+                          // Go back to dashboard to see overlay
+                          context.go('/dashboard');
+                        },
                         icon: const Icon(PhosphorIconsBold.play, size: 20),
                         label: const Text('Start Mowing', style: TextStyle(fontSize: 16)),
                       ),

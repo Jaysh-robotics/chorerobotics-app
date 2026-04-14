@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import '../../active_task/bloc/active_task_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../core/theme/app_colors.dart';
@@ -194,7 +197,7 @@ class _LeafScreenState extends State<LeafScreen> {
                       height: 56,
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(backgroundColor: AppColors.accentOrange),
-                        onPressed: () {},
+                        onPressed: () { context.read<ActiveTaskBloc>().add(const TaskStarted(taskId: 'task_003', taskType: 'collect', zoneId: 'zone_oak', zoneName: 'Under Oak', totalAreaSqM: 18)); context.go('/dashboard'); },
                         icon: const Text('🍂', style: TextStyle(fontSize: 18)),
                         label: const Text('Start Collection', style: TextStyle(fontSize: 16)),
                       ),

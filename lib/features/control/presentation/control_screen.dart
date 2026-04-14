@@ -128,10 +128,16 @@ class _ControlScreenState extends State<ControlScreen> {
                           child: JoystickWidget(
                             size: 180,
                             label: 'DRIVE',
-                            onChanged: (offset) {
+                            deadzone: 0.1,
+                            onSpeedChanged: (speed, angle) {
+                              // Speed is 0.0-1.0 proportional to displacement
+                              // Max robot speed = 2.0 m/s
                               setState(() {
-                                _speed = (offset.dy.abs() * 2).clamp(0.0, 2.0);
-                                _heading = (_heading + offset.dx * 5) % 360;
+                                _speed = speed * 2.0; // 0-2 m/s
+                                if (speed > 0.05) {
+                                  // Convert joystick angle to heading
+                                  _heading = ((_heading + angle * 2) % 360 + 360) % 360;
+                                }
                               });
                             },
                           ),

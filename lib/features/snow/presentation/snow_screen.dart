@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import '../../active_task/bloc/active_task_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../core/theme/app_colors.dart';
@@ -127,7 +130,7 @@ class _SnowScreenState extends State<SnowScreen> {
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () { context.read<ActiveTaskBloc>().add(const TaskStarted(taskId: 'task_002', taskType: 'plow', zoneId: 'zone_driveway', zoneName: 'Driveway', totalAreaSqM: 38)); context.go('/dashboard'); },
                         icon: const Icon(PhosphorIconsBold.snowflake, size: 18),
                         label: const Text('Start Plowing', style: TextStyle(fontSize: 16)),
                       ),
