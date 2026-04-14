@@ -1,0 +1,5 @@
+bless>=0.2.5          # BLE GATT peripheral server (cross-platform)
+websockets>=13.0      # WebSocket server
+firebase-admin>=6.5   # Firebase Admin SDK
+# rpi-ws281x>=5.0     # LED strip (Jetson/RPi only — uncomment on robot)
+# rclpy                # ROS2 Python client (installed with ROS2 — not on pip)
