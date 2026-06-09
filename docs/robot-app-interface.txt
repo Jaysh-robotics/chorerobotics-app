@@ -1,0 +1,247 @@
+CHOREROBOTICS — ROBOT / APP INTERFACE PARAMETERS
+=================================================
+What the app receives from the robot, and what the app
+sends to the perception and motion planning modules.
+
+
+================================================================
+A. DATA THE APP RECEIVES FROM THE ROBOT  (robot -> app)
+================================================================
+
+These are values the app displays or reacts to in real time.
+
+--- BATTERY ---
+  battery_pct             float   0-100       State of charge %
+  battery_voltage         float   volts       Terminal voltage (e.g. 25.4 V)
+  battery_current_amps    float   amps        Current draw (negative = charging)
+  battery_temp_c          float   celsius     Pack temperature
+  battery_health_pct      float   0-100       State of health %
+  battery_cycles          int                 Total charge/discharge cycles
+
+--- MOTION (from odometry + IMU) ---
+  speed_ms                float   m/s         Ground speed
+  heading_deg             float   0-359.99    Compass heading (0=N, 90=E)
+
+--- GPS / POSITIONING ---
+  latitude                float   degrees     WGS84 latitude
+  longitude               float   degrees     WGS84 longitude
+  rtk_status              string              "none" | "single" | "float" | "fix"
+  satellite_count         int                 Satellites in solution
+  accuracy_cm             float   cm          Horizontal position accuracy
+
+--- MOTORS (4 drive motors) ---
+  fl_rpm                  int     RPM         Front-left motor speed
+  fr_rpm                  int     RPM         Front-right motor speed
+  rl_rpm                  int     RPM         Rear-left motor speed
+  rr_rpm                  int     RPM         Rear-right motor speed
+
+--- SYSTEM ---
+  system_temp_c           float   celsius     Jetson board temperature
+  state                   string              "idle" | "working" | "charging" |
+                                              "paused" | "error" | "estop" | "docked"
+  signal_strength         int     0-4         Connection quality bars
+  attachment_type         string              "mower_blade" | "snow_plow" |
+                                              "leaf_collector" | "none"
+  estop_active            bool                Whether E-Stop is engaged
+  blade_on                bool                Whether attachment motor is running
+
+--- TASK PROGRESS (during autonomous operation) ---
+  task_id                 string              Unique task ID
+  task_type               string              "mow" | "plow" | "collect"
+  zone_id                 string              Zone being operated on
+  zone_name               string              Human-readable zone name
+  task_status             string              "idle" | "running" | "paused" |
+                                              "completed" | "failed" | "cancelled"
+  progress_pct            float   0-100       Completion percentage
+  area_completed_sq_m     float   m²          Area covered so far
+  area_total_sq_m         float   m²          Total zone area
+  elapsed_seconds         int     seconds     Wall-clock time since start
+  battery_used_pct        float   0-100       Battery consumed by this task
+  coverage_path           list    lat/lng     GPS breadcrumb trail
+  fail_reason             string              "obstacle" | "battery_low" | "stuck" |
+                                              "connection_lost" | "estop" | null
+  can_resume              bool                Whether task can resume from current pos
+
+--- PERCEPTION MODULE OUTPUT (robot -> app) ---
+  These are new parameters we need from the perception stack:
+
+  detected_obstacles      list                Array of obstacles currently seen
+    .type                 string              "person" | "animal" | "vehicle" |
+                                              "object" | "unknown"
+    .distance_m           float   meters      Distance from robot
+    .bearing_deg          float   degrees     Relative angle from robot heading
+    .confidence           float   0-1.0       Detection confidence
+    .bounding_box         object              {x, y, w, h} in camera frame (optional)
+
+  terrain_type            string              "grass" | "gravel" | "concrete" |
+                                              "snow" | "mud" | "leaves" | "unknown"
+  terrain_condition       string              "dry" | "wet" | "icy" | "soft"
+
+  boundary_detected       bool                Whether robot sees a zone boundary
+  boundary_distance_m     float   meters      Distance to nearest boundary edge
+
+  slope_deg               float   degrees     Current ground slope (0 = flat)
+  slope_direction_deg     float   degrees     Direction of steepest descent
+
+  camera_feed_available   bool                Whether live camera stream is active
+  camera_feed_url         string              Local stream URL (WebRTC/MJPEG)
+
+--- MOTION PLANNING MODULE OUTPUT (robot -> app) ---
+  These are new parameters we need from the motion planner:
+
+  planned_path            list    lat/lng     Upcoming planned waypoints
+  current_waypoint_index  int                 Index in planned_path being targeted
+  path_remaining_m        float   meters      Distance remaining on current path
+  eta_seconds             int     seconds     Estimated time to task completion
+  replanning              bool                Whether the planner is recalculating
+  replan_reason           string              "obstacle" | "boundary" | "stuck" |
+                                              "user_zone_update" | null
+
+  nav_mode                string              "manual" | "autonomous" | "docking" |
+                                              "returning_home"
+  linear_velocity_cmd     float   m/s         Current commanded forward speed
+  angular_velocity_cmd    float   rad/s       Current commanded turn rate
+
+--- ALERTS / DIAGNOSTICS ---
+  alert_id                string              Unique alert ID
+  severity                string              "critical" | "warning" | "info"
+  category                string              "motor" | "blade" | "battery" |
+                                              "connection" | "gps" | "sensor" |
+                                              "system" | "safety"
+  code                    string              Machine-readable (e.g. "MOTOR_FL_OVERCURRENT")
+  title                   string              Short human-readable title
+  message                 string              Detailed description
+  component               string              Affected component name
+  is_active               bool                Whether fault is still present
+
+
+================================================================
+B. COMMANDS THE APP SENDS TO THE PERCEPTION MODULE  (app -> perception)
+================================================================
+
+These configure what the perception system looks for and how it behaves.
+
+--- ZONE DEFINITIONS ---
+  Purpose: Tell perception where the work boundaries are
+  zone_id                 string              Zone identifier
+  zone_name               string              Human-readable name
+  zone_type               string              "mow" | "plow" | "collect"
+  vertices                list    lat/lng     Polygon vertices [{lat, lng}, ...]
+  area_sq_m               float   m²          Computed zone area
+
+--- NO-GO ZONES ---
+  Purpose: Mark areas the robot must avoid (flower beds, pools, etc.)
+  nogo_zone_id            string              Zone identifier
+  vertices                list    lat/lng     Polygon vertices
+  reason                  string              "garden" | "pool" | "structure" | "custom"
+
+--- OBSTACLE MARKERS (user-placed) ---
+  Purpose: Let user manually flag known obstacles on the map
+  marker_id               string              Unique marker ID
+  position                object  lat/lng     {lat, lng}
+  radius_m                float   meters      Avoidance radius
+  label                   string              User label (e.g. "tree stump")
+  permanent               bool                Whether to remember across sessions
+
+--- PERCEPTION SENSITIVITY ---
+  Purpose: Let user tune how cautious the robot is
+  obstacle_sensitivity    string              "low" | "medium" | "high"
+                                              (how aggressively to detect/avoid)
+  min_obstacle_distance_m float   meters      Minimum clearance from obstacles
+  enable_person_detection bool                Whether to use human detection model
+  enable_animal_detection bool                Whether to detect animals
+
+
+================================================================
+C. COMMANDS THE APP SENDS TO THE MOTION PLANNING MODULE  (app -> motion planning)
+================================================================
+
+These control how the robot moves and plans paths.
+
+--- MANUAL DRIVE (joystick / d-pad) ---
+  Purpose: Direct velocity control at 30 Hz during manual mode
+  linear_x                float   -1.0 to 1.0    Forward (+) / backward (-)
+  angular_z               float   -1.0 to 1.0    Turn left (+) / right (-)
+  blade_on                bool                    Run attachment motor
+  turbo_mode              bool                    Allow higher max speed
+
+--- TASK START ---
+  Purpose: Begin an autonomous task
+  task_type               string              "mow" | "plow" | "collect"
+  zone_id                 string              Which zone to work in
+
+  Mow parameters:
+    pattern               string              "straight" | "diagonal" | "checker" | "spiral"
+    angle_deg             float   0-180       Stripe angle
+    overlap_pct           float   0-30        Pass overlap %
+    cutting_height_mm     int     25-100      Blade height in mm
+
+  Plow parameters:
+    start_position        string              "entrance" | "garage" | "center" | "custom"
+    custom_start_lat      float               Custom start latitude (if custom)
+    custom_start_lng      float               Custom start longitude (if custom)
+    snow_depth            string              "light" | "medium" | "heavy"
+    disposal_direction    string              "left" | "right" | "pile_zone"
+    pile_zone_id          string              Destination zone (if pile_zone)
+
+  Collect parameters:
+    mode                  string              "full_zone" | "spot_clean"
+    spot_clean_vertices   list    lat/lng     Spot clean polygon (if spot_clean)
+    collection_mode       string              "mulch" | "bag"
+    dump_point_lat        float               Dump point latitude (if bag)
+    dump_point_lng        float               Dump point longitude (if bag)
+
+--- TASK CONTROL ---
+  Purpose: Control a running task
+  task_stop               + reason            "user_requested" | "weather" | "schedule_end"
+  task_pause              (no params)
+  task_resume             (no params)
+
+--- E-STOP ---
+  Purpose: Emergency stop — highest priority, all channels
+  activate                bool                true = stop, false = clear
+  confirmation_code       string              Required to clear (safety)
+
+--- BLADE CONTROL ---
+  Purpose: Toggle attachment motor (local connection only, not cloud)
+  enabled                 bool                true = on, false = off
+
+--- DOCK / RETURN HOME ---
+  Purpose: Navigate back to charging dock
+  (no parameters)
+
+--- SPEED / PLANNING LIMITS ---
+  Purpose: Let user constrain motion planner behavior
+  max_speed_ms            float   m/s         User-set speed cap
+  enable_turbo            bool                Whether turbo mode is allowed
+  edge_mode               string              "stop" | "slow" | "turn"
+                                              What to do at zone boundary
+  path_type               string              "efficient" | "thorough"
+                                              Prioritize speed vs. coverage
+
+
+================================================================
+D. SUMMARY TABLE
+================================================================
+
+  Direction             Module              Count
+  ---------             ------              -----
+  Robot -> App          Telemetry           ~30 fields
+  Robot -> App          Perception output   ~12 fields
+  Robot -> App          Motion plan output  ~9 fields
+  Robot -> App          Alerts/diagnostics  ~7 fields
+  App -> Perception     Zone definitions    ~5 fields per zone
+  App -> Perception     No-go zones         ~4 fields per zone
+  App -> Perception     Obstacle markers    ~5 fields per marker
+  App -> Perception     Sensitivity config  ~4 fields
+  App -> Motion Plan    Drive command       ~4 fields at 30 Hz
+  App -> Motion Plan    Task start          ~5-8 fields per task
+  App -> Motion Plan    Task control        ~3 commands
+  App -> Motion Plan    E-Stop              ~2 fields
+  App -> Motion Plan    Speed/plan limits   ~4 fields
+
+
+
+
+
+scalability, aws compatibilty, research study for the databaase and datastorage. slide on this.

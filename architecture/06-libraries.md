@@ -56,9 +56,9 @@ dependencies:
   # ── UI Components ──
   flutter_joystick: ^0.4.1         # Virtual joystick with spring-back
                                     # Good for single-stick; landscape compatible
-  phosphor_flutter: ^2.1.0         # Icon library (weight variants: thin→bold)
+  phosphoricons_flutter: ^1.0.0     # Icon library (weight variants: thin→bold)
                                     # WINNER over Lucide: weight system for
-                                    # active/inactive states
+                                    # active/inactive states (Dart 3.x compatible)
 
   # ── Animation ──
   flutter_animate: ^4.5.2          # Declarative animations (already using)
@@ -189,7 +189,7 @@ dev_dependencies:
 
 ---
 
-### Icons: `phosphor_flutter ^2.1.0`
+### Icons: `phosphoricons_flutter ^1.0.0`
 
 **Why over Lucide/Material:**
 - Weight variants (thin, light, regular, bold, fill, duotone)
@@ -255,7 +255,7 @@ drift_flutter: ^0.2.4
 | mqtt_client | ~80KB |
 | web_socket_channel | ~15KB |
 | hive_flutter | ~100KB |
-| phosphor_flutter | ~50KB (tree-shaken) |
+| phosphoricons_flutter | ~50KB (tree-shaken) |
 | flutter_joystick | ~20KB |
 | firebase_messaging | ~200KB (Phase 3) |
 | **Total added** | **~1.1MB** |

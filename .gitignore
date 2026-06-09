@@ -43,3 +43,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# ChoreRobotics App Custom Ignores
+.claude/scheduled_tasks.lock
+.playwright-mcp/
+screenshots/
+*graphify-out/
+/ios/Podfile.bak
+/assets/new/
+/docs/*.pdf
+/docs/*.xlsx
+
