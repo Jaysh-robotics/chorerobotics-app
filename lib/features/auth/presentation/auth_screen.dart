@@ -14,8 +14,17 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
+  final _emailCtrl = TextEditingController();
+  final _passwordCtrl = TextEditingController();
   bool _rememberMe = true;
   bool _obscurePassword = true;
+
+  @override
+  void dispose() {
+    _emailCtrl.dispose();
+    _passwordCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +34,14 @@ class _AuthScreenState extends State<AuthScreen> {
         listener: (context, state) {
           if (state is AuthSuccess) {
             context.go(state.hasRobotPaired ? '/dashboard' : '/onboarding/scan');
+          } else if (state is AuthFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message), backgroundColor: AppColors.brandRed),
+            );
+          } else if (state is AuthPasswordResetSent) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Reset email sent to ${state.email}')),
+            );
           }
         },
         child: Scaffold(
@@ -36,45 +53,42 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Logo
                     Image.asset(
-                      'assets/logo/chore-robots-logo.png',
-                      width: 180,
-                      height: 124,
+                      'assets/logo/chore-robotics-full-dark.png',
+                      width: 240,
                       fit: BoxFit.contain,
                     )
                         .animate()
                         .fadeIn(duration: 600.ms)
-                        .scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1), duration: 600.ms),
+                        .scale(begin: const Offset(0.92, 0.92), end: const Offset(1, 1), duration: 600.ms, curve: Curves.easeOutCubic),
 
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 20),
                     Text(
-                      'Autonomous lawn care,\nsnow clearing & more',
+                      'Autonomous lawn care, snow clearing & more',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                         color: AppColors.textMuted,
                         height: 1.5,
+                        letterSpacing: 0.2,
                       ),
-                    ).animate().fadeIn(delay: 200.ms, duration: 400.ms),
+                    ).animate().fadeIn(delay: 250.ms, duration: 400.ms),
 
-                    const SizedBox(height: 48),
+                    const SizedBox(height: 40),
 
-                    // Email
-                    const BrandInput(
+                    BrandInput(
                       label: 'Email',
                       hint: 'you@example.com',
-                      initialValue: 'jay@chorerobotics.com',
+                      controller: _emailCtrl,
                       keyboardType: TextInputType.emailAddress,
                     ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.05),
 
                     const SizedBox(height: 16),
 
-                    // Password
                     BrandInput(
                       label: 'Password',
                       hint: 'Enter password',
-                      initialValue: '••••••••••',
+                      controller: _passwordCtrl,
                       obscureText: _obscurePassword,
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -88,7 +102,6 @@ class _AuthScreenState extends State<AuthScreen> {
 
                     const SizedBox(height: 16),
 
-                    // Remember me + Forgot
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -101,10 +114,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                 height: 18,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(
-                                    color: AppColors.brandBlue,
-                                    width: 1.5,
-                                  ),
+                                  border: Border.all(color: AppColors.brandBlue, width: 1.5),
                                   color: _rememberMe ? AppColors.blueDim : Colors.transparent,
                                 ),
                                 child: _rememberMe
@@ -119,72 +129,89 @@ class _AuthScreenState extends State<AuthScreen> {
                             ],
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {},
-                          child: const Text(
-                            'Forgot password?',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: AppColors.brandBlue,
-                              fontWeight: FontWeight.w500,
+                        Builder(builder: (context) {
+                          return GestureDetector(
+                            onTap: () {
+                              final email = _emailCtrl.text.trim();
+                              if (email.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Enter your email first.')),
+                                );
+                                return;
+                              }
+                              context.read<AuthBloc>().add(AuthPasswordResetRequested(email));
+                            },
+                            child: const Text(
+                              'Forgot password?',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: AppColors.brandBlue,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        }),
                       ],
                     ).animate().fadeIn(delay: 500.ms),
 
                     const SizedBox(height: 24),
 
-                    // Sign In Button
-                    Builder(
-                      builder: (context) {
-                        return BlocBuilder<AuthBloc, AuthState>(
-                          builder: (context, state) {
-                            return ElevatedButton(
-                              onPressed: state is AuthLoading
-                                  ? null
-                                  : () {
-                                      context.read<AuthBloc>().add(
-                                            const AuthLoginRequested(
-                                              email: 'jay@chorerobotics.com',
-                                              password: 'password',
-                                            ),
-                                          );
-                                    },
-                              child: state is AuthLoading
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : const Text('Sign In'),
-                            );
-                          },
-                        );
-                      },
-                    ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.05),
+                    // Sign In
+                    Builder(builder: (context) {
+                      return BlocBuilder<AuthBloc, AuthState>(
+                        builder: (context, state) {
+                          final loading = state is AuthLoading;
+                          return ElevatedButton(
+                            onPressed: loading ? null : () => _submitLogin(context),
+                            child: loading
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Text('Sign In'),
+                          );
+                        },
+                      );
+                    }).animate().fadeIn(delay: 600.ms).slideY(begin: 0.05),
 
                     const SizedBox(height: 12),
 
-                    // Create Account
-                    OutlinedButton(
-                      onPressed: () {},
-                      child: const Text('Create Account'),
-                    ).animate().fadeIn(delay: 650.ms),
+                    Builder(builder: (context) {
+                      return OutlinedButton.icon(
+                        onPressed: () {
+                          context.read<AuthBloc>().add(AuthGoogleRequested());
+                        },
+                        icon: const Icon(Icons.g_mobiledata, size: 24),
+                        label: const Text('Continue with Google'),
+                      );
+                    }).animate().fadeIn(delay: 650.ms),
 
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 12),
 
-                    // Guest
-                    GestureDetector(
-                      onTap: () => context.go('/onboarding/scan'),
-                      child: const Text(
-                        'Continue as Guest',
-                        style: TextStyle(fontSize: 13, color: AppColors.textMuted),
-                      ),
-                    ).animate().fadeIn(delay: 700.ms),
+                    Builder(builder: (context) {
+                      return TextButton(
+                        onPressed: () => _submitSignUp(context),
+                        child: const Text('Create Account'),
+                      );
+                    }).animate().fadeIn(delay: 675.ms),
+
+                    const SizedBox(height: 16),
+
+                    Builder(builder: (context) {
+                      return GestureDetector(
+                        onTap: () {
+                          context.read<AuthBloc>().add(AuthGuestRequested());
+                        },
+                        child: const Text(
+                          'Continue as Guest',
+                          style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+                        ),
+                      );
+                    }).animate().fadeIn(delay: 700.ms),
 
                     const SizedBox(height: 40),
                   ],
@@ -195,5 +222,33 @@ class _AuthScreenState extends State<AuthScreen> {
         ),
       ),
     );
+  }
+
+  void _submitLogin(BuildContext context) {
+    final email = _emailCtrl.text.trim();
+    final password = _passwordCtrl.text;
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter email and password.')),
+      );
+      return;
+    }
+    context.read<AuthBloc>().add(AuthLoginRequested(
+          email: email,
+          password: password,
+          rememberMe: _rememberMe,
+        ));
+  }
+
+  void _submitSignUp(BuildContext context) {
+    final email = _emailCtrl.text.trim();
+    final password = _passwordCtrl.text;
+    if (email.isEmpty || password.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter email and a password (min 6 chars).')),
+      );
+      return;
+    }
+    context.read<AuthBloc>().add(AuthSignUpRequested(email: email, password: password));
   }
 }
