@@ -5,6 +5,7 @@ import '../../../core/widgets/connection_bar.dart';
 import '../../../core/widgets/brand_card.dart';
 import '../../../core/widgets/brand_badge.dart';
 import '../../../core/widgets/metric_row.dart';
+import 'widgets/battery_history_chart.dart';
 
 class BatteryScreen extends StatelessWidget {
   const BatteryScreen({super.key});
@@ -156,23 +157,20 @@ class BatteryScreen extends StatelessWidget {
                     ),
                   ).animate().fadeIn(delay: 200.ms),
                   const SizedBox(height: 10),
-                  // History Chart placeholder
+                  // 7-day battery state-of-charge chart (fl_chart)
                   BrandCard(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('7-DAY HISTORY', style: Theme.of(context).textTheme.labelSmall),
-                        const SizedBox(height: 16),
-                        Container(
-                          height: 120,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: AppColors.bgSurface,
-                          ),
-                          child: const Center(
-                            child: Text('Chart — fl_chart integration', style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('7-DAY HISTORY', style: Theme.of(context).textTheme.labelSmall),
+                            const BrandBadge(label: 'Charge %', variant: BadgeVariant.orange),
+                          ],
                         ),
+                        const SizedBox(height: 16),
+                        const BatteryHistoryChart(),
                       ],
                     ),
                   ).animate().fadeIn(delay: 300.ms),
