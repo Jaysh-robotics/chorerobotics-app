@@ -28,21 +28,49 @@ class SetupCompleteScreen extends StatelessWidget {
                     Text('Your robot is ready to go', style: Theme.of(context).textTheme.titleSmall),
                     const SizedBox(height: 24),
 
-                    // Success checkmark
+                    // Brand mark celebration with success check
                     Center(
-                      child: Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.blueDim,
-                          border: Border.all(color: AppColors.brandBlue.withValues(alpha: 0.15), width: 2),
-                        ),
-                        child: const Icon(Icons.check, size: 44, color: AppColors.brandBlue),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 132,
+                            height: 132,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(
+                                colors: [
+                                  AppColors.accentOrange.withValues(alpha: 0.18),
+                                  AppColors.accentOrange.withValues(alpha: 0.0),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Image.asset(
+                            'assets/logo/chore-robotics-mark.png',
+                            width: 88,
+                            height: 88,
+                            fit: BoxFit.contain,
+                          ),
+                          Positioned(
+                            right: 12,
+                            bottom: 12,
+                            child: Container(
+                              width: 30,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: AppColors.statusGreen,
+                                border: Border.all(color: AppColors.bgPrimary, width: 2),
+                              ),
+                              child: const Icon(Icons.check, size: 16, color: Colors.white),
+                            ),
+                          ),
+                        ],
                       ),
                     )
                         .animate()
-                        .scale(begin: const Offset(0.5, 0.5), duration: 500.ms, curve: Curves.elasticOut)
+                        .scale(begin: const Offset(0.6, 0.6), duration: 600.ms, curve: Curves.elasticOut)
                         .fadeIn(duration: 300.ms),
 
                     const SizedBox(height: 24),

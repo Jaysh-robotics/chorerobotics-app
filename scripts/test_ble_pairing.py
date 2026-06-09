@@ -155,10 +155,36 @@ async def main():
         await gatt.start()
         await pairing.initialize()
 
+        # bless doesn't deliver connection events reliably on macOS, so
+        # start pairing at boot — the code is ready whenever the phone
+        # connects and reads/writes characteristics.
+        await pairing.on_device_connected("pending")
+        code = await pairing.start_pairing()
         logger.info("")
-        logger.info("🔵 Robot is advertising. Waiting for app to connect...")
-        logger.info("   Press Ctrl+C to stop.")
+        logger.info("╔══════════════════════════════════╗")
+        logger.info(f"║   PAIRING CODE:  {code}          ║")
+        logger.info("║   Enter this in the app          ║")
+        logger.info("╚══════════════════════════════════╝")
         logger.info("")
+        await gatt.notify_pairing_state(robot_state.pairing.phase.value)
+
+        logger.info("🔵 Robot advertising. Waiting for app to submit code...")
+        logger.info("   Press Ctrl+C to stop. Press 'r' + Enter to regenerate code.")
+        logger.info("")
+
+        # Allow code regeneration on demand
+        async def input_loop():
+            loop = asyncio.get_event_loop()
+            while True:
+                line = await loop.run_in_executor(None, sys.stdin.readline)
+                if line.strip().lower() == "r":
+                    new_code = await pairing.start_pairing()
+                    logger.info("")
+                    logger.info(f"🔄 New pairing code: {new_code}")
+                    logger.info("")
+                    await gatt.notify_pairing_state(robot_state.pairing.phase.value)
+
+        asyncio.create_task(input_loop())
 
         # Run forever until Ctrl+C
         while True:

@@ -90,6 +90,7 @@ class GattServer:
         self._robot_state = robot_state
         self._telemetry = telemetry
         self._server: Optional[BlessServer] = None
+        self._loop: Optional[asyncio.AbstractEventLoop] = None
         self._is_running: bool = False
         self._is_advertising: bool = False
         self._connected_device: Optional[str] = None
@@ -114,7 +115,10 @@ class GattServer:
         """Start the BLE GATT server with all services."""
         logger.info(f"Starting BLE GATT server as '{self._device_name}'")
 
-        self._server = BlessServer(name=self._device_name, loop=asyncio.get_event_loop())
+        # Capture the running loop so write handlers (called by CoreBluetooth
+        # on a non-asyncio thread) can dispatch coroutines back to us safely.
+        self._loop = asyncio.get_running_loop()
+        self._server = BlessServer(name=self._device_name, loop=self._loop)
         self._server.read_request_func = self._handle_read
         self._server.write_request_func = self._handle_write
 
@@ -270,9 +274,11 @@ class GattServer:
         elif uuid == BLE_CHAR_PAIRING_CODE:
             code = data.decode("utf-8").strip()
             logger.info(f"Pairing code received: {code}")
-            if self.on_pairing_code_received:
-                asyncio.get_event_loop().create_task(
-                    self._async_pairing_code(code)
+            if self.on_pairing_code_received and self._loop is not None:
+                # CoreBluetooth calls this handler from a non-asyncio thread.
+                # Dispatch the coroutine back to our main loop safely.
+                asyncio.run_coroutine_threadsafe(
+                    self._async_pairing_code(code), self._loop
                 )
 
         elif uuid == BLE_CHAR_DRIVE_COMMAND:
