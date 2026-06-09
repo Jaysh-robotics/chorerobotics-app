@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/connection_bar.dart';
 import '../../../core/widgets/brand_card.dart';
@@ -22,8 +22,13 @@ class DashboardScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
             child: Row(
               children: [
-                Image.asset('assets/logo/chore-robots-logo.png', width: 32, height: 22, fit: BoxFit.contain),
-                const SizedBox(width: 10),
+                Image.asset(
+                  'assets/logo/chore-robotics-mark.png',
+                  width: 30,
+                  height: 30,
+                  fit: BoxFit.contain,
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

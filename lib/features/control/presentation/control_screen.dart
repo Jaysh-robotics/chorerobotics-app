@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/joystick_widget.dart';
 import '../../../core/widgets/compass_widget.dart';

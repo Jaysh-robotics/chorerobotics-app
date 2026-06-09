@@ -1,32 +1,45 @@
 import 'package:flutter/material.dart';
 
-/// ChoreRobotics brand colors derived from logo spectrum.
-/// Logo: blue → purple → magenta → red → pink → silver
+/// ChoreRobotics brand colors derived from the logo:
+/// orange hex mark + vivid green scan + tan "ROBOTICS" wordmark on black.
 class AppColors {
   AppColors._();
 
-  // ── Brand Spectrum (from logo) ──
-  static const Color brandBlue = Color(0xFF3B5EE8);
-  static const Color brandPurple = Color(0xFF8B45B5);
-  static const Color brandMagenta = Color(0xFFD63384);
-  static const Color brandRed = Color(0xFFEF3350);
-  static const Color brandPink = Color(0xFFF5758C);
+  // ── Brand Spectrum (sampled directly from logo image) ──
+  static const Color brandOrange = Color(0xFFFC8502); // primary mark color
+  static const Color brandGreen = Color(0xFF2DA801); // scan underline / live signal
+  static const Color brandTan = Color(0xFFAD6C20); // "ROBOTICS" sub-wordmark
+  static const Color brandAmber = Color(0xFFFFA940); // soft fade of orange
+  static const Color brandRed = Color(0xFFEF3350); // safety / alerts
   static const Color brandSilver = Color(0xFFC8CDD5);
 
+  // Legacy aliases — old call sites keep compiling, but render in new brand hues.
+  static const Color brandBlue = brandOrange;
+  static const Color brandPurple = brandGreen;
+  static const Color brandMagenta = brandTan;
+  static const Color brandPink = brandAmber;
+
   static const LinearGradient brandGradient = LinearGradient(
-    colors: [brandBlue, brandPurple, brandMagenta, brandRed, brandSilver],
-    stops: [0.0, 0.25, 0.5, 0.75, 1.0],
+    colors: [brandOrange, brandAmber, brandTan, brandGreen, brandSilver],
+    stops: [0.0, 0.30, 0.55, 0.80, 1.0],
   );
 
   static const LinearGradient brandGradientHorizontal = LinearGradient(
-    colors: [brandBlue, brandPurple, brandMagenta, brandRed, brandSilver],
-    stops: [0.0, 0.25, 0.5, 0.75, 1.0],
+    colors: [brandOrange, brandAmber, brandGreen],
+    stops: [0.0, 0.55, 1.0],
   );
 
+  // Primary "hero" gradient — used by progress bars, avatar chips, etc.
   static const LinearGradient bluePurpleGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [brandBlue, brandPurple],
+    colors: [brandOrange, brandAmber],
+  );
+
+  static const LinearGradient orangeGreenGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [brandOrange, brandGreen],
   );
 
   // ── Backgrounds ──
@@ -43,10 +56,11 @@ class AppColors {
   static const Color textMuted = Color(0xFF555D6E);
 
   // ── Functional Status Colors ──
-  static const Color statusGreen = Color(0xFF00C853);
+  // statusGreen now aligns with the brand green for consistency.
+  static const Color statusGreen = brandGreen;
   static const Color accentYellow = Color(0xFFFFB300);
   static const Color accentRed = Color(0xFFFF3B30);
-  static const Color accentOrange = Color(0xFFFF6D00);
+  static const Color accentOrange = brandOrange;
   static const Color accentCyan = Color(0xFF00BCD4);
 
   // ── Safety ──
@@ -58,11 +72,15 @@ class AppColors {
   static const Color borderActive = Color(0x24FFFFFF); // 14% white
 
   // ── Dim variants ──
-  static Color blueDim = brandBlue.withValues(alpha: 0.10);
-  static Color purpleDim = brandPurple.withValues(alpha: 0.10);
-  static Color magentaDim = brandMagenta.withValues(alpha: 0.10);
-  static Color greenDim = statusGreen.withValues(alpha: 0.08);
+  static Color orangeDim = brandOrange.withValues(alpha: 0.10);
+  static Color greenDim = brandGreen.withValues(alpha: 0.10);
+  static Color tanDim = brandTan.withValues(alpha: 0.10);
+  static Color amberDim = brandAmber.withValues(alpha: 0.10);
   static Color yellowDim = accentYellow.withValues(alpha: 0.08);
   static Color redDim = accentRed.withValues(alpha: 0.10);
-  static Color orangeDim = accentOrange.withValues(alpha: 0.08);
+
+  // Legacy aliases
+  static Color blueDim = orangeDim;
+  static Color purpleDim = greenDim;
+  static Color magentaDim = tanDim;
 }

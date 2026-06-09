@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/connection_bar.dart';
 import '../../active_task/bloc/active_task_bloc.dart';
 import '../../../core/widgets/brand_card.dart';
 import '../../../core/widgets/brand_badge.dart';
+import '../../../core/widgets/brand_back_button.dart';
 
 class MowingScreen extends StatefulWidget {
   const MowingScreen({super.key});
@@ -52,11 +53,19 @@ class _MowingScreenState extends State<MowingScreen> {
             const ConnectionBar(),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  Text('Start Mowing', style: Theme.of(context).textTheme.headlineLarge),
-                  const Text('Mow Zone 1 — Front Yard', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
+                  const BrandBackButton(),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Start Mowing', style: Theme.of(context).textTheme.headlineLarge),
+                        const Text('Mow Zone 1 — Front Yard', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

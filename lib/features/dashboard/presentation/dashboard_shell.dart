@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/estop_button.dart';
 import '../../active_task/presentation/active_task_overlay.dart';
@@ -48,14 +48,14 @@ class _DashboardShellState extends State<DashboardShell> {
           _buildScreen(),
           // Active task overlay (above content, below E-Stop)
           if (!_isLandscape) const Positioned(
-            bottom: 145,
+            bottom: 85,
             left: 0,
             right: 0,
             child: ActiveTaskOverlay(),
           ),
           // E-Stop overlay (only for portrait screens)
           if (!_isLandscape) Positioned(
-            bottom: 80,
+            bottom: 20,
             left: 0,
             right: 0,
             child: EStopButton(

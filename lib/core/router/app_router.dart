@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/auth_screen.dart';
+import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/onboarding/presentation/ble_scan_screen.dart';
 import '../../features/onboarding/presentation/pairing_screen.dart';
 import '../../features/onboarding/presentation/wifi_setup_screen.dart';
@@ -16,8 +17,18 @@ import '../../features/fleet/presentation/fleet_screen.dart';
 
 class AppRouter {
   static final router = GoRouter(
-    initialLocation: '/auth',
+    initialLocation: '/',
     routes: [
+      // Splash
+      GoRoute(
+        path: '/',
+        name: 'splash',
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: const SplashScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+              FadeTransition(opacity: animation, child: child),
+        ),
+      ),
       // Auth
       GoRoute(
         path: '/auth',

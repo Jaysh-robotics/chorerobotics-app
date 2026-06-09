@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/connection_bar.dart';
 import '../../../core/widgets/brand_card.dart';
+import '../../../core/widgets/brand_back_button.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -20,10 +21,7 @@ class ProfileScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
               child: Row(
                 children: [
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: const Icon(Icons.arrow_back, color: AppColors.textSecondary),
-                  ),
+                  const BrandBackButton(),
                   const SizedBox(width: 12),
                   Text('Profile', style: Theme.of(context).textTheme.headlineLarge),
                 ],

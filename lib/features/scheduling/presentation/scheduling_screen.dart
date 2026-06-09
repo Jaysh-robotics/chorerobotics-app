@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/connection_bar.dart';
 import '../../../core/widgets/brand_card.dart';
+import '../../../core/widgets/brand_back_button.dart';
 
 class SchedulingScreen extends StatelessWidget {
   const SchedulingScreen({super.key});
@@ -19,14 +20,17 @@ class SchedulingScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Schedules', style: Theme.of(context).textTheme.headlineLarge),
-                      const Text('Automated tasks', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
-                    ],
+                  const BrandBackButton(),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Schedules', style: Theme.of(context).textTheme.headlineLarge),
+                        const Text('Automated tasks', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
+                      ],
+                    ),
                   ),
                   Container(
                     padding: const EdgeInsets.all(10),

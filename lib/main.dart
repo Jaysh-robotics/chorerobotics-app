@@ -3,9 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
+import 'core/firebase/firebase_initializer.dart';
+import 'core/firebase/messaging_service.dart';
 import 'features/active_task/bloc/active_task_bloc.dart';
+import 'features/onboarding/bloc/onboarding_bloc.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -13,6 +16,17 @@ void main() {
       statusBarIconBrightness: Brightness.light,
     ),
   );
+
+  // Firebase init temporarily disabled — the app boots straight into the UI
+  // so we can iterate on visuals without auth/Firestore round-trips.
+  // ignore: dead_code
+  if (false) {
+    final fbReady = await FirebaseInitializer.init();
+    if (fbReady) {
+      MessagingService().initAndGetToken();
+    }
+  }
+
   runApp(const ChoreRoboticsApp());
 }
 
@@ -21,8 +35,11 @@ class ChoreRoboticsApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => ActiveTaskBloc(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => ActiveTaskBloc()),
+        BlocProvider(create: (_) => OnboardingBloc()),
+      ],
       child: MaterialApp.router(
         title: 'ChoreRobotics',
         theme: AppTheme.darkTheme,

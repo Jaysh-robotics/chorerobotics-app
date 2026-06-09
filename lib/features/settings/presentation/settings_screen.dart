@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/connection_bar.dart';
 import '../../../core/widgets/brand_card.dart';
 import '../../../core/widgets/brand_badge.dart';
+import '../../../core/widgets/brand_back_button.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -18,11 +19,20 @@ class SettingsScreen extends StatelessWidget {
             const ConnectionBar(),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text('Settings', style: Theme.of(context).textTheme.headlineLarge),
-                  const Text('Robot & App Configuration', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
+                  const BrandBackButton(),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Settings', style: Theme.of(context).textTheme.headlineLarge),
+                        const Text('Robot & App Configuration', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -161,3 +171,4 @@ class _SettingsTile extends StatelessWidget {
     );
   }
 }
+

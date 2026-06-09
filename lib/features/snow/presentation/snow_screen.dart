@@ -3,11 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../active_task/bloc/active_task_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/connection_bar.dart';
 import '../../../core/widgets/brand_card.dart';
 import '../../../core/widgets/brand_badge.dart';
+import '../../../core/widgets/brand_back_button.dart';
 import '../../../core/widgets/toggle_group.dart';
 
 class SnowScreen extends StatefulWidget {
@@ -32,11 +33,19 @@ class _SnowScreenState extends State<SnowScreen> {
             const ConnectionBar(batteryPercent: 85),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  Text('Snow Plowing', style: Theme.of(context).textTheme.headlineLarge),
-                  const Text('Driveway — 38 m²', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
+                  const BrandBackButton(),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Snow Plowing', style: Theme.of(context).textTheme.headlineLarge),
+                        const Text('Driveway — 38 m²', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

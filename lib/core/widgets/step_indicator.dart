@@ -14,9 +14,26 @@ class StepIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      child: Row(
-        children: List.generate(totalSteps * 2 - 1, (index) {
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: Image.asset(
+              'assets/logo/chore-robotics-mark.png',
+              height: 26,
+              fit: BoxFit.contain,
+            ),
+          ),
+          _buildDots(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDots() {
+    return Row(
+      children: List.generate(totalSteps * 2 - 1, (index) {
           if (index.isOdd) {
             final lineIndex = index ~/ 2;
             return Expanded(
@@ -65,7 +82,6 @@ class StepIndicator extends StatelessWidget {
             ),
           );
         }),
-      ),
     );
   }
 }
