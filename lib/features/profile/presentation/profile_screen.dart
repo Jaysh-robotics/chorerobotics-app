@@ -51,7 +51,7 @@ class ProfileScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          const Text('Jay Shah', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+                          const Text('Jaysh', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
                           const SizedBox(height: 2),
                           const Text('jay@chorerobotics.com', style: TextStyle(fontSize: 14, color: AppColors.textMuted)),
                         ],
