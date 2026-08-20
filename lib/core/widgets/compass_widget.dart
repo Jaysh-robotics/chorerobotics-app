@@ -2,20 +2,88 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
-class CompassWidget extends StatelessWidget {
+class CompassWidget extends StatefulWidget {
   final double heading; // degrees
   final double size;
+  final Duration duration;
+  final Curve curve;
 
-  const CompassWidget({super.key, this.heading = 45, this.size = 90});
+  const CompassWidget({
+    super.key,
+    this.heading = 0,
+    this.size = 90,
+    this.duration = const Duration(milliseconds: 500),
+    this.curve = Curves.easeOutCubic,
+  });
+
+  @override
+  State<CompassWidget> createState() => _CompassWidgetState();
+}
+
+class _CompassWidgetState extends State<CompassWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: widget.duration);
+    _animation = Tween<double>(
+      begin: widget.heading,
+      end: widget.heading,
+    ).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
+  }
+
+  @override
+  void didUpdateWidget(CompassWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.heading != widget.heading) {
+      _animateToHeading(widget.heading);
+    }
+  }
+
+  void _animateToHeading(double target) {
+    final start = _animation.value;
+    final startNormalized = (start % 360 + 360) % 360;
+    final targetNormalized = (target % 360 + 360) % 360;
+
+    double diff = targetNormalized - startNormalized;
+    if (diff > 180) {
+      diff -= 360;
+    } else if (diff < -180) {
+      diff += 360;
+    }
+
+    final end = start + diff;
+
+    _controller.stop();
+    _animation = Tween<double>(
+      begin: start,
+      end: end,
+    ).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
+    _controller.forward(from: 0);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: CustomPaint(
-        painter: _CompassPainter(heading: heading),
-      ),
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return SizedBox(
+          width: widget.size,
+          height: widget.size,
+          child: CustomPaint(
+            painter: _CompassPainter(heading: _animation.value),
+          ),
+        );
+      },
     );
   }
 }

@@ -18,7 +18,7 @@ class DpadControlScreen extends StatefulWidget {
 class _DpadControlScreenState extends State<DpadControlScreen> {
   bool _bladeOn = false;
   double _speed = 0.0;
-  double _heading = 45;
+  double _heading = 0;
   int _augerSpeed = 0;
   DpadDirection _currentDir = DpadDirection.none;
 

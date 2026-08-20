@@ -26,6 +26,7 @@ class JoystickWidget extends StatefulWidget {
 
 class _JoystickWidgetState extends State<JoystickWidget> with SingleTickerProviderStateMixin {
   Offset _thumbOffset = Offset.zero;
+  bool _isDragging = false;
   late AnimationController _springController;
   late Animation<Offset> _springAnimation;
 
@@ -40,8 +41,10 @@ class _JoystickWidgetState extends State<JoystickWidget> with SingleTickerProvid
     );
     _springController.addListener(() {
       setState(() => _thumbOffset = _springAnimation.value);
-      widget.onChanged?.call(_normalize(_thumbOffset));
-      widget.onSpeedChanged?.call(_speedFromOffset(_thumbOffset), _angleFromOffset(_thumbOffset));
+      if (_isDragging) {
+        widget.onChanged?.call(_normalize(_thumbOffset));
+        widget.onSpeedChanged?.call(_speedFromOffset(_thumbOffset), _angleFromOffset(_thumbOffset));
+      }
     });
   }
 
@@ -86,7 +89,11 @@ class _JoystickWidgetState extends State<JoystickWidget> with SingleTickerProvid
       mainAxisSize: MainAxisSize.min,
       children: [
         GestureDetector(
+          onPanStart: (_) {
+            _isDragging = true;
+          },
           onPanUpdate: (details) {
+            _isDragging = true;
             setState(() {
               _thumbOffset = _clampToCircle(_thumbOffset + details.delta);
             });
@@ -95,6 +102,18 @@ class _JoystickWidgetState extends State<JoystickWidget> with SingleTickerProvid
             widget.onSpeedChanged?.call(_speedFromOffset(_thumbOffset), _angleFromOffset(_thumbOffset));
           },
           onPanEnd: (_) {
+            _isDragging = false;
+            widget.onChanged?.call(Offset.zero);
+            widget.onSpeedChanged?.call(0.0, 0.0);
+            _springAnimation = Tween<Offset>(begin: _thumbOffset, end: Offset.zero).animate(
+              CurvedAnimation(parent: _springController, curve: Curves.elasticOut),
+            );
+            _springController.forward(from: 0);
+          },
+          onPanCancel: () {
+            _isDragging = false;
+            widget.onChanged?.call(Offset.zero);
+            widget.onSpeedChanged?.call(0.0, 0.0);
             _springAnimation = Tween<Offset>(begin: _thumbOffset, end: Offset.zero).animate(
               CurvedAnimation(parent: _springController, curve: Curves.elasticOut),
             );
