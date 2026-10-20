@@ -6,8 +6,10 @@ class AppColors {
   AppColors._();
 
   // ── Brand Spectrum (sampled directly from logo image) ──
-  static const Color brandOrange = Color(0xFFFC8502); // primary mark color
-  static const Color brandGreen = Color(0xFF2DA801); // scan underline / live signal
+  static const Color brandOrange = Color(0xFFFF7A1A); // Figma primary accent
+  static const Color brandGreen = Color(
+    0xFF2DA801,
+  ); // scan underline / live signal
   static const Color brandTan = Color(0xFFAD6C20); // "ROBOTICS" sub-wordmark
   static const Color brandAmber = Color(0xFFFFA940); // soft fade of orange
   static const Color brandRed = Color(0xFFEF3350); // safety / alerts
@@ -43,17 +45,17 @@ class AppColors {
   );
 
   // ── Backgrounds ──
-  static const Color bgPrimary = Color(0xFF0A0C10);
-  static const Color bgSecondary = Color(0xFF10131A);
-  static const Color bgCard = Color(0xFF151820);
-  static const Color bgCardHover = Color(0xFF1A1E28);
-  static const Color bgSurface = Color(0xFF0D0F14);
-  static const Color bgPage = Color(0xFF050608);
+  static const Color bgPrimary = Color(0xFF0A0A0B);
+  static const Color bgSecondary = Color(0xFF111113);
+  static const Color bgCard = Color(0xFF171719);
+  static const Color bgCardHover = Color(0xFF1C1C1F);
+  static const Color bgSurface = Color(0xFF1C1C1F);
+  static const Color bgPage = Color(0xFF0A0A0B);
 
   // ── Text ──
-  static const Color textPrimary = Color(0xFFE8EAED);
-  static const Color textSecondary = Color(0xFF8B929E);
-  static const Color textMuted = Color(0xFF555D6E);
+  static const Color textPrimary = Color(0xFFFFFFFF);
+  static const Color textSecondary = Color(0xFFB4B4B9);
+  static const Color textMuted = Color(0xFF8A8A90);
 
   // ── Functional Status Colors ──
   // statusGreen now aligns with the brand green for consistency.
@@ -68,8 +70,8 @@ class AppColors {
   static const Color estopYellow = Color(0xFFFFD600);
 
   // ── Borders ──
-  static const Color border = Color(0x0FFFFFFF); // 6% white
-  static const Color borderActive = Color(0x24FFFFFF); // 14% white
+  static const Color border = Color(0xFF2A2A2E);
+  static const Color borderActive = brandOrange;
 
   // ── Dim variants ──
   static Color orangeDim = brandOrange.withValues(alpha: 0.10);

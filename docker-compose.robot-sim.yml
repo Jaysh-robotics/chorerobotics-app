@@ -1,0 +1,12 @@
+services:
+  robot-sim:
+    build:
+      context: .
+      dockerfile: Dockerfile.robot-sim
+    environment:
+      CHOREROBOT_SIM_HOST: 0.0.0.0
+      CHOREROBOT_SIM_PORT: 8765
+      # Set CHOREROBOT_SIM_TOKEN later when the app supports pairing-token headers.
+      # CHOREROBOT_SIM_TOKEN: dev-token
+    ports:
+      - "8765:8765"

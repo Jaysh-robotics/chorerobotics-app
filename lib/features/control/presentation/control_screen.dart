@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../../../core/theme/app_colors.dart';
@@ -19,10 +20,9 @@ class ControlScreen extends StatefulWidget {
 }
 
 class _ControlScreenState extends State<ControlScreen> {
-  final _commandClient = RobotCommandClient();
-  final _serverUrlCtrl = TextEditingController(
-    text: 'ws://192.168.1.100:8765/ws',
-  );
+  final _serverUrlCtrl = TextEditingController();
+  late RobotCommandClient _commandClient;
+  bool _listeningToCommandClient = false;
   bool _bladeOn = false;
   double _speed = 0.8;
   double _heading = 0;
@@ -31,7 +31,6 @@ class _ControlScreenState extends State<ControlScreen> {
   @override
   void initState() {
     super.initState();
-    _commandClient.addListener(_onCommandClientChanged);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
@@ -39,15 +38,33 @@ class _ControlScreenState extends State<ControlScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final client = context.read<RobotCommandClient>();
+    if (_listeningToCommandClient && identical(_commandClient, client)) return;
+    if (_listeningToCommandClient) {
+      _commandClient.removeListener(_onCommandClientChanged);
+    }
+    _commandClient = client;
+    _serverUrlCtrl.text = _commandClient.serverUrl;
+    _commandClient.addListener(_onCommandClientChanged);
+    _listeningToCommandClient = true;
+  }
+
+  @override
   void dispose() {
-    _commandClient.removeListener(_onCommandClientChanged);
-    _commandClient.dispose();
+    if (_listeningToCommandClient) {
+      _commandClient.removeListener(_onCommandClientChanged);
+    }
     _serverUrlCtrl.dispose();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     super.dispose();
   }
 
   void _onCommandClientChanged() {
+    if (_serverUrlCtrl.text != _commandClient.serverUrl) {
+      _serverUrlCtrl.text = _commandClient.serverUrl;
+    }
     if (mounted) setState(() {});
   }
 
@@ -258,7 +275,8 @@ class _ControlScreenState extends State<ControlScreen> {
                                 if (speed > 0.05) {
                                   // Convert joystick angle to heading (0° = North/Up, 90° = East/Right)
                                   final angleDeg = angle * 180 / math.pi;
-                                  _heading = ((angleDeg + 90) % 360 + 360) % 360;
+                                  _heading =
+                                      ((angleDeg + 90) % 360 + 360) % 360;
                                 }
                               });
                               _sendDriveFromJoystick(speed, angle);
@@ -310,8 +328,7 @@ class _ControlScreenState extends State<ControlScreen> {
                               _ServerPanel(
                                 controller: _serverUrlCtrl,
                                 client: _commandClient,
-                                onConnect: () =>
-                                    _commandClient.connect(_serverUrlCtrl.text),
+                                onConnect: () => _commandClient.connect(),
                                 onDisconnect: _commandClient.disconnect,
                               ),
                               const SizedBox(height: 8),
@@ -380,23 +397,21 @@ class _ControlScreenState extends State<ControlScreen> {
                                 label: 'Auto Mode',
                                 color: AppColors.brandBlue,
                                 onPressed: () =>
-                                    _commandClient.sendTaskCommand('auto_mode'),
+                                    _commandClient.sendTaskResume(),
                               ),
                               const SizedBox(height: 8),
                               _ControlButton(
                                 icon: PhosphorIconsBold.house,
                                 label: 'Return to Dock',
                                 color: AppColors.brandBlue,
-                                onPressed: () =>
-                                    _commandClient.sendTaskCommand('dock'),
+                                onPressed: _commandClient.sendDock,
                               ),
                               const SizedBox(height: 8),
                               _ControlButton(
                                 icon: PhosphorIconsBold.pause,
                                 label: 'Pause',
                                 color: AppColors.brandPurple,
-                                onPressed: () =>
-                                    _commandClient.sendTaskCommand('pause'),
+                                onPressed: () => _commandClient.sendTaskPause(),
                               ),
                             ],
                           ),
@@ -540,6 +555,7 @@ class _ServerPanel extends StatelessWidget {
             height: 36,
             child: TextField(
               controller: controller,
+              onChanged: client.setServerUrl,
               style: const TextStyle(
                 fontSize: 11,
                 color: AppColors.textPrimary,

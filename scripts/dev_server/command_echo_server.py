@@ -22,6 +22,7 @@ from typing import Any
 
 try:
     import websockets
+    from websockets.exceptions import ConnectionClosed
 except ImportError as exc:  # pragma: no cover - startup guidance
     raise SystemExit(
         "Missing dependency: websockets\n"
@@ -49,10 +50,10 @@ def local_ip_candidates() -> list[str]:
     ips: set[str] = set()
     hostname = socket.gethostname()
     try:
-      for result in socket.getaddrinfo(hostname, None, socket.AF_INET):
-          ip = result[4][0]
-          if not ip.startswith("127."):
-              ips.add(ip)
+        for result in socket.getaddrinfo(hostname, None, socket.AF_INET):
+            ip = result[4][0]
+            if not ip.startswith("127."):
+                ips.add(ip)
     except socket.gaierror:
         pass
     return sorted(ips)
@@ -60,6 +61,7 @@ def local_ip_candidates() -> list[str]:
 
 async def handle_client(websocket: Any) -> None:
     peer = getattr(websocket, "remote_address", "unknown")
+    disconnect_reason = "closed"
     print(f"[connect] {peer}")
     try:
         async for raw in websocket:
@@ -100,8 +102,10 @@ async def handle_client(websocket: Any) -> None:
             )
             await websocket.send(reply)
             print(f"[ack] {message_type} command_id={message_id}")
+    except ConnectionClosed as exc:
+        disconnect_reason = f"code={exc.code} reason={exc.reason or 'connection_closed'}"
     finally:
-        print(f"[disconnect] {peer}")
+        print(f"[disconnect] {peer} {disconnect_reason}")
 
 
 async def main() -> None:

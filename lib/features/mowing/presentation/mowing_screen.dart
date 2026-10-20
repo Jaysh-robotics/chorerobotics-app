@@ -1,227 +1,233 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/connection_bar.dart';
-import '../../active_task/bloc/active_task_bloc.dart';
-import '../../../core/widgets/brand_card.dart';
-import '../../../core/widgets/brand_badge.dart';
-import '../../../core/widgets/brand_back_button.dart';
+import 'package:provider/provider.dart';
 
-class MowingScreen extends StatefulWidget {
+import '../../../core/app/robot_app_controller.dart';
+import '../../../core/robot/robot_command_client.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/flow_ui.dart';
+
+class MowingScreen extends StatelessWidget {
   const MowingScreen({super.key});
 
   @override
-  State<MowingScreen> createState() => _MowingScreenState();
-}
-
-class _MowingScreenState extends State<MowingScreen> {
-  int _selectedPattern = 0;
-  double _angle = 45;
-  double _overlap = 10;
-
-  void _simulateProgress(BuildContext ctx) {
-    // Demo: simulate progress ticking up, then get "stuck" at 65%
-    final bloc = ctx.read<ActiveTaskBloc>();
-    Future.delayed(const Duration(seconds: 2), () {
-      if (!ctx.mounted) return;
-      bloc.add(const TaskProgressUpdated(completedAreaSqM: 28, progressPercent: 20, batteryUsed: 8, elapsedSeconds: 120));
-    });
-    Future.delayed(const Duration(seconds: 4), () {
-      if (!ctx.mounted) return;
-      bloc.add(const TaskProgressUpdated(completedAreaSqM: 56, progressPercent: 40, batteryUsed: 16, elapsedSeconds: 240));
-    });
-    Future.delayed(const Duration(seconds: 6), () {
-      if (!ctx.mounted) return;
-      bloc.add(const TaskProgressUpdated(completedAreaSqM: 92, progressPercent: 65, batteryUsed: 28, elapsedSeconds: 420));
-    });
-    Future.delayed(const Duration(seconds: 8), () {
-      if (!ctx.mounted) return;
-      bloc.add(const TaskFailed('stuck'));
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bgPrimary,
-      body: SafeArea(
-        child: Column(
-          children: [
-            const ConnectionBar(),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-              child: Row(
+    final app = context.watch<RobotAppController>();
+    final client = context.watch<RobotCommandClient>();
+
+    return FlowScaffold(
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 8),
+            child: Row(
+              children: [
+                FlowBackButton(onPressed: () => context.go('/attachments')),
+                const SizedBox(width: 12),
+                Container(
+                  width: 26,
+                  height: 26,
+                  decoration: BoxDecoration(
+                    color: AppColors.brandOrange,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.agriculture_rounded, size: 18),
+                ),
+                const SizedBox(width: 8),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Lawn Mower',
+                        style: TextStyle(
+                          fontSize: 19,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      Text(
+                        'Chore-014 · Front yard',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.bgSurface,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: client.isConnected
+                              ? AppColors.brandOrange
+                              : AppColors.textMuted,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        client.isConnected ? 'Online' : 'Offline',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: client.isConnected
+                              ? AppColors.brandOrange
+                              : AppColors.textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 6, 20, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const BrandBackButton(),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  _ValueSlider(
+                    label: 'Stripe Angle',
+                    valueLabel: '${app.stripeAngle.round()}°',
+                    value: app.stripeAngle,
+                    min: 0,
+                    max: 135,
+                    divisions: 3,
+                    marks: const ['0°', '45°', '90°', '135°'],
+                    onChanged: app.setStripeAngle,
+                    onChangeEnd: (value) =>
+                        app.setStripeAngle(value, send: true),
+                  ),
+                  const SizedBox(height: 20),
+                  const FlowSectionLabel('Stripe Pattern'),
+                  const SizedBox(height: 10),
+                  Container(
+                    height: 43,
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: AppColors.bgSurface,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
                       children: [
-                        Text('Start Mowing', style: Theme.of(context).textTheme.headlineLarge),
-                        const Text('Mow Zone 1 — Front Yard', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
+                        Expanded(
+                          child: _PatternButton(
+                            label: 'Straight',
+                            icon: Icons.horizontal_rule_rounded,
+                            selected: app.stripePattern == 'straight',
+                            onTap: () => app.setStripePattern('straight'),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: _PatternButton(
+                            label: 'Checker',
+                            icon: Icons.grid_view_rounded,
+                            selected: app.stripePattern == 'checker',
+                            onTap: () => app.setStripePattern('checker'),
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Zone summary
-                    BrandCard(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 40, height: 40,
-                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: AppColors.bgSurface),
-                                child: const Icon(PhosphorIconsBold.robot, size: 20, color: AppColors.textMuted),
-                              ),
-                              const SizedBox(width: 10),
-                              const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Front Yard', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                                  Text('142 m² — 1 no-go zone', style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const BrandBadge(label: 'Ready', variant: BadgeVariant.blue),
-                        ],
-                      ),
-                    ).animate().fadeIn(duration: 200.ms),
-                    const SizedBox(height: 12),
-                    // Pattern Selection
-                    Text('STRIPE PATTERN', style: Theme.of(context).textTheme.labelSmall),
-                    const SizedBox(height: 10),
-                    GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 8,
-                      crossAxisSpacing: 8,
-                      childAspectRatio: 1.2,
-                      children: [
-                        _PatternCard(name: 'Straight', isSelected: _selectedPattern == 0, onTap: () => setState(() => _selectedPattern = 0), icon: PhosphorIconsBold.arrowsVertical),
-                        _PatternCard(name: 'Diagonal', isSelected: _selectedPattern == 1, onTap: () => setState(() => _selectedPattern = 1), icon: PhosphorIconsBold.arrowUpRight),
-                        _PatternCard(name: 'Checker', isSelected: _selectedPattern == 2, onTap: () => setState(() => _selectedPattern = 2), icon: PhosphorIconsBold.gridFour, subtitle: '2x time'),
-                        _PatternCard(name: 'Spiral', isSelected: _selectedPattern == 3, onTap: () => setState(() => _selectedPattern = 3), icon: PhosphorIconsBold.spiral),
-                      ],
-                    ).animate().fadeIn(delay: 100.ms),
-                    const SizedBox(height: 12),
-                    // Angle Slider
-                    BrandCard(
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text('Stripe Angle', style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
-                              Text('${_angle.round()}°', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'monospace')),
-                            ],
-                          ),
-                          SliderTheme(
-                            data: SliderThemeData(
-                              activeTrackColor: AppColors.brandBlue,
-                              inactiveTrackColor: AppColors.bgSurface,
-                              thumbColor: AppColors.brandBlue,
-                              overlayColor: AppColors.brandBlue.withValues(alpha: 0.1),
-                              trackHeight: 6,
-                            ),
-                            child: Slider(value: _angle, min: 0, max: 180, onChanged: (v) => setState(() => _angle = v)),
-                          ),
-                        ],
-                      ),
+                  const SizedBox(height: 20),
+                  _ValueSlider(
+                    label: 'Height of Cut',
+                    valueLabel: '${app.cutHeightMm.round()}mm',
+                    value: app.cutHeightMm,
+                    min: 20,
+                    max: 80,
+                    divisions: 4,
+                    marks: const ['20mm', '35mm', '50mm', '65mm', '80mm'],
+                    onChanged: app.setCutHeight,
+                    onChangeEnd: (value) => app.setCutHeight(value, send: true),
+                  ),
+                  const SizedBox(height: 20),
+                  const FlowSectionLabel('Zone'),
+                  const SizedBox(height: 10),
+                  FlowPanel(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
                     ),
-                    const SizedBox(height: 8),
-                    // Overlap Slider
-                    BrandCard(
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text('Pass Overlap', style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
-                              Text('${_overlap.round()}%', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'monospace')),
-                            ],
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: app.zoneId,
+                        isExpanded: true,
+                        dropdownColor: AppColors.bgCard,
+                        icon: const Icon(
+                          Icons.expand_more_rounded,
+                          color: AppColors.textMuted,
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'zone_1',
+                            child: _ZoneLabel('Zone 1'),
                           ),
-                          SliderTheme(
-                            data: SliderThemeData(
-                              activeTrackColor: AppColors.brandPurple,
-                              inactiveTrackColor: AppColors.bgSurface,
-                              thumbColor: AppColors.brandPurple,
-                              overlayColor: AppColors.brandPurple.withValues(alpha: 0.1),
-                              trackHeight: 6,
-                            ),
-                            child: Slider(value: _overlap, min: 0, max: 30, onChanged: (v) => setState(() => _overlap = v)),
+                          DropdownMenuItem(
+                            value: 'zone_2',
+                            child: _ZoneLabel('Zone 2'),
                           ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    // Estimates
-                    BrandCard(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Estimated Time', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
-                              SizedBox(height: 2),
-                              Text('1h 20m', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              const Text('Battery Needed', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
-                              const SizedBox(height: 2),
-                              Text('~58%', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.brandPurple)),
-                            ],
+                          DropdownMenuItem(
+                            value: 'zone_3',
+                            child: _ZoneLabel('Zone 3'),
                           ),
                         ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    // Start
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          context.read<ActiveTaskBloc>().add(const TaskStarted(
-                            taskId: 'task_001',
-                            taskType: 'mow',
-                            zoneId: 'zone_1',
-                            zoneName: 'Front Yard',
-                            totalAreaSqM: 142,
-                          ));
-                          // Simulate progress updates
-                          _simulateProgress(context);
-                          // Go back to dashboard to see overlay
-                          context.go('/dashboard');
+                        onChanged: (value) {
+                          if (value == null) return;
+                          app.setZone(value, 'Zone ${value.split('_').last}');
                         },
-                        icon: const Icon(PhosphorIconsBold.play, size: 20),
-                        label: const Text('Start Mowing', style: TextStyle(fontSize: 16)),
+                      ),
+                    ),
+                  ),
+                  if (app.schedule != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      'Scheduled for ${app.schedule!.formattedTime}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.brandOrange,
                       ),
                     ),
                   ],
-                ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+      footer: FlowFooter(
+        child: Row(
+          children: [
+            Expanded(
+              child: FlowPrimaryButton(
+                label: app.schedule == null ? 'Schedule' : 'Scheduled',
+                backgroundColor: AppColors.bgSurface,
+                onPressed: () => context.push('/schedule'),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: FlowPrimaryButton(
+                label: 'Start',
+                icon: Icons.play_arrow_rounded,
+                onPressed: () {
+                  app.startMowing();
+                  context.go('/active-task');
+                },
               ),
             ),
           ],
@@ -231,54 +237,162 @@ class _MowingScreenState extends State<MowingScreen> {
   }
 }
 
-class _PatternCard extends StatelessWidget {
-  final String name;
-  final bool isSelected;
-  final VoidCallback onTap;
-  final IconData icon;
-  final String? subtitle;
+class _ValueSlider extends StatelessWidget {
+  const _ValueSlider({
+    required this.label,
+    required this.valueLabel,
+    required this.value,
+    required this.min,
+    required this.max,
+    required this.divisions,
+    required this.marks,
+    required this.onChanged,
+    required this.onChangeEnd,
+  });
 
-  const _PatternCard({required this.name, required this.isSelected, required this.onTap, required this.icon, this.subtitle});
+  final String label;
+  final String valueLabel;
+  final double value;
+  final double min;
+  final double max;
+  final int divisions;
+  final List<String> marks;
+  final ValueChanged<double> onChanged;
+  final ValueChanged<double> onChangeEnd;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: isSelected ? AppColors.brandBlue : AppColors.border,
-            width: isSelected ? 1.5 : 1,
+    return Column(
+      children: [
+        FlowSectionLabel(
+          label,
+          trailing: Text(
+            valueLabel,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              color: AppColors.brandOrange,
+            ),
           ),
-          color: isSelected ? AppColors.blueDim : AppColors.bgCard,
         ),
-        child: Column(
+        const SizedBox(height: 8),
+        FlowPanel(
+          padding: const EdgeInsets.fromLTRB(10, 17, 10, 14),
+          child: Column(
+            children: [
+              SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  activeTrackColor: AppColors.brandOrange,
+                  inactiveTrackColor: AppColors.bgSurface,
+                  thumbColor: AppColors.brandOrange,
+                  overlayColor: AppColors.orangeDim,
+                  trackHeight: 4,
+                ),
+                child: Slider(
+                  value: value,
+                  min: min,
+                  max: max,
+                  divisions: divisions,
+                  label: valueLabel,
+                  onChanged: onChanged,
+                  onChangeEnd: onChangeEnd,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: marks
+                      .map(
+                        (mark) => Text(
+                          mark,
+                          style: const TextStyle(
+                            fontSize: 10.5,
+                            color: AppColors.textMuted,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PatternButton extends StatelessWidget {
+  const _PatternButton({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(11),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 140),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.brandOrange : Colors.transparent,
+          borderRadius: BorderRadius.circular(11),
+        ),
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 60,
-              height: 44,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(6),
-                color: AppColors.bgSurface,
-              ),
-              child: Icon(icon, size: 24, color: isSelected ? AppColors.brandBlue : AppColors.textMuted),
+            Icon(
+              icon,
+              size: 20,
+              color: selected ? Colors.white : AppColors.textMuted,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(width: 8),
             Text(
-              name,
+              label,
               style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: isSelected ? AppColors.brandPurple : AppColors.textPrimary,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: selected ? Colors.white : AppColors.textMuted,
               ),
             ),
-            if (subtitle != null)
-              Text(subtitle!, style: TextStyle(fontSize: 10, color: AppColors.brandPink)),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ZoneLabel extends StatelessWidget {
+  const _ZoneLabel(this.label);
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: const BoxDecoration(
+            color: AppColors.brandOrange,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+        ),
+      ],
     );
   }
 }

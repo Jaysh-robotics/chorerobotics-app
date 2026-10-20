@@ -1,0 +1,17 @@
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV CHOREROBOT_SIM_HOST=0.0.0.0
+ENV CHOREROBOT_SIM_PORT=8765
+
+WORKDIR /app
+
+COPY scripts/robot_server/requirements-sim.txt /app/scripts/robot_server/requirements-sim.txt
+RUN pip install --no-cache-dir -r /app/scripts/robot_server/requirements-sim.txt
+
+COPY scripts /app/scripts
+
+EXPOSE 8765
+
+CMD ["python", "scripts/robot_server/simulated_robot_server.py"]

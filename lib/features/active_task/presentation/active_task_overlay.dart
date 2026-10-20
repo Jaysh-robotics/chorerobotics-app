@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
+import '../../../core/robot/robot_command_client.dart';
 import '../../../core/theme/app_colors.dart';
 import '../bloc/active_task_bloc.dart';
 
@@ -14,7 +15,8 @@ class ActiveTaskOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ActiveTaskBloc, ActiveTaskState>(
       builder: (context, state) {
-        if (state.status == TaskStatus.idle || state.status == TaskStatus.completed) {
+        if (state.status == TaskStatus.idle ||
+            state.status == TaskStatus.completed) {
           return const SizedBox.shrink();
         }
         return _TaskCard(state: state);
@@ -37,7 +39,11 @@ class _TaskCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: _borderColor),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.4), blurRadius: 20, offset: const Offset(0, 8)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.4),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
         ],
       ),
       child: Column(
@@ -46,7 +52,10 @@ class _TaskCard extends StatelessWidget {
           // Header: task type + status badge
           Row(
             children: [
-              _TaskIcon(taskType: state.taskType ?? 'mow', status: state.status),
+              _TaskIcon(
+                taskType: state.taskType ?? 'mow',
+                status: state.status,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -54,11 +63,18 @@ class _TaskCard extends StatelessWidget {
                   children: [
                     Text(
                       _taskLabel,
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                     Text(
                       state.zoneName ?? 'Zone',
-                      style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                      ),
                     ),
                   ],
                 ),
@@ -93,10 +109,22 @@ class _TaskCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _Stat(label: 'Progress', value: '${state.progressPercent.toStringAsFixed(0)}%', color: AppColors.brandBlue),
-              _Stat(label: 'Area', value: '${state.completedAreaSqM.toStringAsFixed(0)} / ${state.totalAreaSqM.toStringAsFixed(0)} m²'),
+              _Stat(
+                label: 'Progress',
+                value: '${state.progressPercent.toStringAsFixed(0)}%',
+                color: AppColors.brandBlue,
+              ),
+              _Stat(
+                label: 'Area',
+                value:
+                    '${state.completedAreaSqM.toStringAsFixed(0)} / ${state.totalAreaSqM.toStringAsFixed(0)} m²',
+              ),
               _Stat(label: 'Elapsed', value: state.formattedElapsed),
-              _Stat(label: 'ETA', value: state.formattedRemaining, color: AppColors.brandPurple),
+              _Stat(
+                label: 'ETA',
+                value: state.formattedRemaining,
+                color: AppColors.brandPurple,
+              ),
             ],
           ),
 
@@ -111,13 +139,20 @@ class _TaskCard extends StatelessWidget {
                   child: SizedBox(
                     height: 44,
                     child: ElevatedButton.icon(
-                      onPressed: () => context.read<ActiveTaskBloc>().add(TaskResumed()),
+                      onPressed: () {
+                        context.read<RobotCommandClient>().sendTaskResume(
+                          taskId: state.taskId,
+                        );
+                        context.read<ActiveTaskBloc>().add(TaskResumed());
+                      },
                       icon: const Icon(PhosphorIconsBold.play, size: 16),
                       label: const Text('Resume'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.brandBlue,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ),
                   ),
@@ -128,13 +163,26 @@ class _TaskCard extends StatelessWidget {
                   child: SizedBox(
                     height: 44,
                     child: OutlinedButton(
-                      onPressed: () => context.read<ActiveTaskBloc>().add(TaskCancelled()),
+                      onPressed: () {
+                        context.read<RobotCommandClient>().sendTaskStop(
+                          taskId: state.taskId,
+                          reason: 'user_cancelled',
+                        );
+                        context.read<ActiveTaskBloc>().add(TaskCancelled());
+                      },
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.accentRed,
-                        side: BorderSide(color: AppColors.accentRed.withValues(alpha: 0.3)),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        side: BorderSide(
+                          color: AppColors.accentRed.withValues(alpha: 0.3),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                      child: const Text('Cancel', style: TextStyle(fontSize: 13)),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(fontSize: 13),
+                      ),
                     ),
                   ),
                 ),
@@ -146,13 +194,22 @@ class _TaskCard extends StatelessWidget {
               height: 44,
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: () => context.read<ActiveTaskBloc>().add(TaskPaused()),
+                onPressed: () {
+                  context.read<RobotCommandClient>().sendTaskPause(
+                    taskId: state.taskId,
+                  );
+                  context.read<ActiveTaskBloc>().add(TaskPaused());
+                },
                 icon: const Icon(PhosphorIconsBold.pause, size: 16),
                 label: const Text('Pause Task'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.brandPurple,
-                  side: BorderSide(color: AppColors.brandPurple.withValues(alpha: 0.3)),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  side: BorderSide(
+                    color: AppColors.brandPurple.withValues(alpha: 0.3),
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
             ),
@@ -178,11 +235,24 @@ class _TaskCard extends StatelessWidget {
   };
 
   LinearGradient get _progressGradient => switch (state.status) {
-    TaskStatus.running => const LinearGradient(colors: [AppColors.brandBlue, AppColors.brandPurple]),
-    TaskStatus.paused => LinearGradient(colors: [AppColors.brandPurple, AppColors.brandPurple.withValues(alpha: 0.6)]),
-    TaskStatus.stuck => const LinearGradient(colors: [AppColors.accentYellow, AppColors.accentOrange]),
-    TaskStatus.failed => const LinearGradient(colors: [AppColors.accentRed, AppColors.accentOrange]),
-    _ => const LinearGradient(colors: [AppColors.brandBlue, AppColors.brandPurple]),
+    TaskStatus.running => const LinearGradient(
+      colors: [AppColors.brandBlue, AppColors.brandPurple],
+    ),
+    TaskStatus.paused => LinearGradient(
+      colors: [
+        AppColors.brandPurple,
+        AppColors.brandPurple.withValues(alpha: 0.6),
+      ],
+    ),
+    TaskStatus.stuck => const LinearGradient(
+      colors: [AppColors.accentYellow, AppColors.accentOrange],
+    ),
+    TaskStatus.failed => const LinearGradient(
+      colors: [AppColors.accentRed, AppColors.accentOrange],
+    ),
+    _ => const LinearGradient(
+      colors: [AppColors.brandBlue, AppColors.brandPurple],
+    ),
   };
 }
 
@@ -222,7 +292,11 @@ class _TaskIcon extends StatelessWidget {
     if (status == TaskStatus.running) {
       iconWidget = iconWidget
           .animate(onPlay: (c) => c.repeat(reverse: true))
-          .scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05), duration: 1000.ms);
+          .scale(
+            begin: const Offset(1, 1),
+            end: const Offset(1.05, 1.05),
+            duration: 1000.ms,
+          );
     }
 
     // Shake when stuck
@@ -245,24 +319,50 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (label, bg, fg) = switch (status) {
-      TaskStatus.running => ('Running', AppColors.brandBlue.withValues(alpha: 0.12), AppColors.brandBlue),
-      TaskStatus.paused => ('Paused', AppColors.brandPurple.withValues(alpha: 0.12), AppColors.brandPurple),
-      TaskStatus.stuck => ('Stuck', AppColors.accentYellow.withValues(alpha: 0.12), AppColors.accentYellow),
-      TaskStatus.failed => (failReason ?? 'Failed', AppColors.accentRed.withValues(alpha: 0.12), AppColors.accentRed),
+      TaskStatus.running => (
+        'Running',
+        AppColors.brandBlue.withValues(alpha: 0.12),
+        AppColors.brandBlue,
+      ),
+      TaskStatus.paused => (
+        'Paused',
+        AppColors.brandPurple.withValues(alpha: 0.12),
+        AppColors.brandPurple,
+      ),
+      TaskStatus.stuck => (
+        'Stuck',
+        AppColors.accentYellow.withValues(alpha: 0.12),
+        AppColors.accentYellow,
+      ),
+      TaskStatus.failed => (
+        failReason ?? 'Failed',
+        AppColors.accentRed.withValues(alpha: 0.12),
+        AppColors.accentRed,
+      ),
       _ => ('', Colors.transparent, Colors.transparent),
     };
 
     Widget badge = Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(100)),
-      child: Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: fg)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(100),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: fg),
+      ),
     );
 
     if (status == TaskStatus.running) {
       badge = Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(width: 6, height: 6, decoration: BoxDecoration(shape: BoxShape.circle, color: fg))
+          Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(shape: BoxShape.circle, color: fg),
+              )
               .animate(onPlay: (c) => c.repeat(reverse: true))
               .fadeIn(duration: 800.ms)
               .then()
@@ -287,9 +387,20 @@ class _Stat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
+        ),
         const SizedBox(height: 2),
-        Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color ?? AppColors.textPrimary, fontFamily: 'monospace')),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: color ?? AppColors.textPrimary,
+            fontFamily: 'monospace',
+          ),
+        ),
       ],
     );
   }

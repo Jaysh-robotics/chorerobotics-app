@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'core/theme/app_theme.dart';
+import 'package:provider/provider.dart';
+
+import 'core/robot/robot_command_client.dart';
 import 'core/router/app_router.dart';
-import 'core/firebase/firebase_initializer.dart';
-import 'core/firebase/messaging_service.dart';
-import 'features/active_task/bloc/active_task_bloc.dart';
-import 'features/onboarding/bloc/onboarding_bloc.dart';
+import 'core/weather/weather_controller.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,35 +12,54 @@ Future<void> main() async {
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light,
+      systemNavigationBarColor: Color(0xFF0A0A0B),
+      systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
-
-  // Firebase init temporarily disabled — the app boots straight into the UI
-  // so we can iterate on visuals without auth/Firestore round-trips.
-  // ignore: dead_code
-  if (false) {
-    final fbReady = await FirebaseInitializer.init();
-    if (fbReady) {
-      MessagingService().initAndGetToken();
-    }
-  }
-
   runApp(const ChoreRoboticsApp());
 }
 
-class ChoreRoboticsApp extends StatelessWidget {
+class ChoreRoboticsApp extends StatefulWidget {
   const ChoreRoboticsApp({super.key});
 
   @override
+  State<ChoreRoboticsApp> createState() => _ChoreRoboticsAppState();
+}
+
+class _ChoreRoboticsAppState extends State<ChoreRoboticsApp> {
+  late final RobotCommandClient _commandClient;
+
+  @override
+  void initState() {
+    super.initState();
+    _commandClient = RobotCommandClient();
+  }
+
+  @override
+  void dispose() {
+    _commandClient.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
+    return MultiProvider(
       providers: [
-        BlocProvider(create: (_) => ActiveTaskBloc()),
-        BlocProvider(create: (_) => OnboardingBloc()),
+        ChangeNotifierProvider.value(value: _commandClient),
+        ChangeNotifierProvider(create: (_) => WeatherController()..start()),
       ],
       child: MaterialApp.router(
-        title: 'ChoreRobotics',
-        theme: AppTheme.darkTheme,
+        title: 'Chore Robotics',
+        theme: ThemeData(
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: Colors.black,
+          fontFamily: 'Poppins',
+          colorScheme: const ColorScheme.dark(
+            primary: Color(0xFFFF8400),
+            surface: Color(0xFF0E0E10),
+          ),
+          useMaterial3: true,
+        ),
         routerConfig: AppRouter.router,
         debugShowCheckedModeBanner: false,
       ),

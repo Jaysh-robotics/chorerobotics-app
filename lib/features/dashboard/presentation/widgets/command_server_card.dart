@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../../core/robot/robot_command_client.dart';
@@ -13,24 +14,37 @@ class CommandServerCard extends StatefulWidget {
 }
 
 class _CommandServerCardState extends State<CommandServerCard> {
-  final _client = RobotCommandClient();
-  final _urlCtrl = TextEditingController(text: 'ws://192.168.1.100:8765/ws');
+  final _urlCtrl = TextEditingController();
+  late RobotCommandClient _client;
+  bool _listening = false;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final client = context.read<RobotCommandClient>();
+    if (_listening && identical(_client, client)) return;
+    if (_listening) {
+      _client.removeListener(_onClientChanged);
+    }
+    _client = client;
+    _urlCtrl.text = _client.serverUrl;
     _client.addListener(_onClientChanged);
+    _listening = true;
   }
 
   @override
   void dispose() {
-    _client.removeListener(_onClientChanged);
-    _client.dispose();
+    if (_listening) {
+      _client.removeListener(_onClientChanged);
+    }
     _urlCtrl.dispose();
     super.dispose();
   }
 
   void _onClientChanged() {
+    if (_urlCtrl.text != _client.serverUrl) {
+      _urlCtrl.text = _client.serverUrl;
+    }
     if (mounted) setState(() {});
   }
 
@@ -147,6 +161,7 @@ class _CommandServerCardState extends State<CommandServerCard> {
           const SizedBox(height: 12),
           TextField(
             controller: _urlCtrl,
+            onChanged: _client.setServerUrl,
             style: const TextStyle(fontSize: 13, color: AppColors.textPrimary),
             decoration: const InputDecoration(
               labelText: 'Server URL',
@@ -185,7 +200,7 @@ class _CommandServerCardState extends State<CommandServerCard> {
                       ? null
                       : (connected
                             ? _client.disconnect
-                            : () => _client.connect(_urlCtrl.text)),
+                            : () => _client.connect()),
                   icon: Icon(
                     connected
                         ? PhosphorIconsBold.plugs

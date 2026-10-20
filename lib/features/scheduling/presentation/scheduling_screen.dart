@@ -1,192 +1,313 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/connection_bar.dart';
-import '../../../core/widgets/brand_card.dart';
-import '../../../core/widgets/brand_back_button.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
-class SchedulingScreen extends StatelessWidget {
+import '../../../core/app/robot_app_controller.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/flow_ui.dart';
+
+class SchedulingScreen extends StatefulWidget {
   const SchedulingScreen({super.key});
 
   @override
+  State<SchedulingScreen> createState() => _SchedulingScreenState();
+}
+
+class _SchedulingScreenState extends State<SchedulingScreen> {
+  static const _minutes = [0, 15, 30, 45];
+  static const _dayShort = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  static const _dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  late int _hour;
+  late int _minute;
+  late String _period;
+  late Set<int> _days;
+
+  @override
+  void initState() {
+    super.initState();
+    final existing = context.read<RobotAppController>().schedule;
+    _hour = existing?.hour ?? 7;
+    _minute = existing?.minute ?? 30;
+    _period = existing?.period ?? 'AM';
+    _days = {...?existing?.days};
+    if (_days.isEmpty) _days = {0, 1, 3, 5};
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bgPrimary,
-      body: SafeArea(
-        child: Column(
-          children: [
-            const ConnectionBar(),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-              child: Row(
+    final app = context.watch<RobotAppController>();
+    final selectedDays = _days.toList()..sort();
+
+    return FlowScaffold(
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 8),
+            child: Row(
+              children: [
+                FlowBackButton(onPressed: () => context.pop()),
+                const SizedBox(width: 12),
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Set Schedule',
+                      style: TextStyle(
+                        fontSize: 19,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    Text(
+                      'Lawn Mower · Zone 2',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const BrandBackButton(),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Schedules', style: Theme.of(context).textTheme.headlineLarge),
-                        const Text('Automated tasks', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
-                      ],
+                  const FlowSectionLabel('Start Time'),
+                  const SizedBox(height: 10),
+                  FlowPanel(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: SizedBox(
+                      height: 168,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: AppColors.bgSurface,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _TimeWheel(
+                                  values: [
+                                    for (var value = 1; value <= 12; value++)
+                                      value.toString().padLeft(2, '0'),
+                                  ],
+                                  initialIndex: _hour - 1,
+                                  onChanged: (index) =>
+                                      setState(() => _hour = index + 1),
+                                ),
+                              ),
+                              Expanded(
+                                child: _TimeWheel(
+                                  values: _minutes
+                                      .map(
+                                        (value) =>
+                                            value.toString().padLeft(2, '0'),
+                                      )
+                                      .toList(),
+                                  initialIndex: _minutes.indexOf(_minute),
+                                  onChanged: (index) =>
+                                      setState(() => _minute = _minutes[index]),
+                                ),
+                              ),
+                              Expanded(
+                                child: _TimeWheel(
+                                  values: const ['AM', 'PM'],
+                                  initialIndex: _period == 'AM' ? 0 : 1,
+                                  onChanged: (index) => setState(
+                                    () => _period = index == 0 ? 'AM' : 'PM',
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: AppColors.brandBlue,
+                  const SizedBox(height: 24),
+                  const FlowSectionLabel('Repeat'),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: List.generate(7, (index) {
+                      final selected = _days.contains(index);
+                      return InkWell(
+                        onTap: () => setState(() {
+                          if (selected) {
+                            _days.remove(index);
+                          } else {
+                            _days.add(index);
+                          }
+                        }),
+                        borderRadius: BorderRadius.circular(20),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 140),
+                          width: 38,
+                          height: 38,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: selected
+                                ? AppColors.brandOrange
+                                : AppColors.bgCard,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: selected
+                                  ? AppColors.brandOrange
+                                  : AppColors.border,
+                            ),
+                          ),
+                          child: Text(
+                            _dayShort[index],
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    _days.isEmpty
+                        ? 'Runs once'
+                        : 'Every week on ${selectedDays.map((index) => _dayNames[index]).join(', ')}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textMuted,
                     ),
-                    child: const Icon(PhosphorIconsBold.plus, size: 18, color: Colors.white),
+                  ),
+                  const SizedBox(height: 24),
+                  Container(
+                    width: double.infinity,
+                    height: 100,
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppColors.bgSurface,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: AppColors.bgCard,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(
+                            Icons.schedule_rounded,
+                            size: 20,
+                            color: AppColors.brandOrange,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Next run: $_hour:${_minute.toString().padLeft(2, '0')} $_period',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Text(
+                                '${_titleCase(app.stripePattern)} pattern · ${app.cutHeightMm.round()}mm · ${app.zoneName}',
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 11.5,
+                                  color: AppColors.textMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
-                child: Column(
-                  children: [
-                    _ScheduleCard(
-                      title: 'Sunday Front Yard',
-                      icon: PhosphorIconsBold.plant,
-                      taskType: 'Mow',
-                      time: '8:00 AM',
-                      days: 'Sunday',
-                      zone: 'Zone 1 — Front Yard',
-                      pattern: 'Straight stripes',
-                      enabled: true,
-                      color: AppColors.brandBlue,
-                    ).animate().fadeIn(duration: 200.ms),
-                    const SizedBox(height: 8),
-                    _ScheduleCard(
-                      title: 'Wed/Sat Driveway',
-                      icon: PhosphorIconsBold.snowflake,
-                      taskType: 'Plow',
-                      time: '6:30 AM',
-                      days: 'Wed, Sat',
-                      zone: 'Driveway',
-                      pattern: 'Auto-trigger on snow',
-                      enabled: true,
-                      color: AppColors.brandPurple,
-                    ).animate().fadeIn(delay: 100.ms, duration: 200.ms),
-                    const SizedBox(height: 8),
-                    _ScheduleCard(
-                      title: 'Friday Leaf Cleanup',
-                      icon: PhosphorIconsBold.leaf,
-                      taskType: 'Collect',
-                      time: '3:00 PM',
-                      days: 'Friday',
-                      zone: 'Under Oak',
-                      pattern: 'Bag mode',
-                      enabled: false,
-                      color: AppColors.brandMagenta,
-                    ).animate().fadeIn(delay: 200.ms, duration: 200.ms),
-                    const SizedBox(height: 24),
-                    // Empty state hint
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppColors.border, style: BorderStyle.solid),
-                      ),
-                      child: Column(
-                        children: [
-                          Icon(PhosphorIconsBold.calendarPlus, size: 32, color: AppColors.textMuted),
-                          const SizedBox(height: 12),
-                          const Text('Tap + to add a new schedule', style: TextStyle(fontSize: 14, color: AppColors.textMuted)),
-                          const SizedBox(height: 4),
-                          const Text('Set your robot to work automatically', style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
-                        ],
+          ),
+        ],
+      ),
+      footer: FlowFooter(
+        child: FlowPrimaryButton(
+          label: 'Set Schedule',
+          icon: Icons.check_rounded,
+          onPressed: _days.isEmpty
+              ? null
+              : () {
+                  app.saveSchedule(
+                    MowerSchedule(
+                      hour: _hour,
+                      minute: _minute,
+                      period: _period,
+                      days: _days,
+                    ),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Schedule saved for $_hour:${_minute.toString().padLeft(2, '0')} $_period.',
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+                  );
+                  context.pop();
+                },
         ),
       ),
     );
   }
+
+  String _titleCase(String value) =>
+      '${value[0].toUpperCase()}${value.substring(1)}';
 }
 
-class _ScheduleCard extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final String taskType;
-  final String time;
-  final String days;
-  final String zone;
-  final String pattern;
-  final bool enabled;
-  final Color color;
-
-  const _ScheduleCard({
-    required this.title,
-    required this.icon,
-    required this.taskType,
-    required this.time,
-    required this.days,
-    required this.zone,
-    required this.pattern,
-    required this.enabled,
-    required this.color,
+class _TimeWheel extends StatelessWidget {
+  const _TimeWheel({
+    required this.values,
+    required this.initialIndex,
+    required this.onChanged,
   });
+
+  final List<String> values;
+  final int initialIndex;
+  final ValueChanged<int> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    return BrandCard(
-      borderColor: enabled ? color.withValues(alpha: 0.2) : AppColors.border,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: color.withValues(alpha: 0.12),
-                ),
-                child: Icon(icon, size: 18, color: color),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: enabled ? AppColors.textPrimary : AppColors.textMuted)),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        Text(taskType, style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w600)),
-                        Text(' · $time · $days', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-                      ],
-                    ),
-                  ],
+    return CupertinoPicker(
+      itemExtent: 44,
+      scrollController: FixedExtentScrollController(initialItem: initialIndex),
+      selectionOverlay: const SizedBox.shrink(),
+      onSelectedItemChanged: onChanged,
+      children: values
+          .map(
+            (value) => Center(
+              child: Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
-              Switch(
-                value: enabled,
-                onChanged: (_) {},
-                activeThumbColor: color,
-                inactiveTrackColor: AppColors.bgSurface,
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const SizedBox(width: 48),
-              Text('$zone · $pattern', style: TextStyle(fontSize: 11, color: enabled ? AppColors.textMuted : AppColors.textMuted.withValues(alpha: 0.5))),
-            ],
-          ),
-        ],
-      ),
+            ),
+          )
+          .toList(),
     );
   }
 }
