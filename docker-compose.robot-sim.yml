@@ -6,7 +6,13 @@ services:
     environment:
       CHOREROBOT_SIM_HOST: 0.0.0.0
       CHOREROBOT_SIM_PORT: 8765
+      CHOREROBOT_DEFAULTS_PATH: /data/mower-defaults.json
       # Set CHOREROBOT_SIM_TOKEN later when the app supports pairing-token headers.
       # CHOREROBOT_SIM_TOKEN: dev-token
     ports:
       - "8765:8765"
+    volumes:
+      - robot-sim-data:/data
+
+volumes:
+  robot-sim-data:

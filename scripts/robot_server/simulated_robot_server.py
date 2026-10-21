@@ -24,6 +24,7 @@ import socket
 import sys
 import time
 import uuid
+from pathlib import Path
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -57,6 +58,8 @@ VALID_MESSAGE_TYPES = {
     "attachment_detect",
     "mower_config_update",
     "schedule_set",
+    "mower_defaults_get",
+    "mower_defaults_set",
 }
 
 
@@ -176,6 +179,12 @@ class SimulatedRobotState:
     battery_percent: float = 78.0
     heading_deg: float = 0.0
     selected_attachment: str = "mower"
+    mower_defaults: dict[str, Any] = field(default_factory=lambda: {
+        "cut_height_mm": 65, "pattern": "straight", "stripe_angle_degrees": 45,
+        "pass_overlap_percent": 10,
+        "schedule": {"enabled": True, "days": [1, 3, 5], "hour": 8,
+                     "minute": 0, "zone_name": "Front Yard"},
+    })
 
     def telemetry_payload(self) -> dict[str, Any]:
         uptime = time.time() - self.boot_time
@@ -256,6 +265,13 @@ class SimulatedRobotServer:
         self.port = port
         self.auth_token = auth_token
         self.state = SimulatedRobotState()
+        self.defaults_path = os.environ.get("CHOREROBOT_DEFAULTS_PATH")
+        self.defaults_saved = False
+        if self.defaults_path and Path(self.defaults_path).exists():
+            defaults = json.loads(Path(self.defaults_path).read_text())
+            if self._valid_defaults(defaults):
+                self.state.mower_defaults = defaults
+                self.defaults_saved = True
         self.clients: set[Any] = set()
         self._server: Any | None = None
         self._telemetry_task: asyncio.Task | None = None
@@ -330,9 +346,42 @@ class SimulatedRobotServer:
             print(f"[reject] {message_type} command_id={message_id}")
             return
 
+        if message_type == "mower_defaults_get":
+            await websocket.send(build_message("command_ack", {
+                "command_id": message_id, "status": "accepted",
+                "defaults": self.state.mower_defaults,
+                "saved": self.defaults_saved,
+            }))
+            return
+
         if self.state.estop_active and message_type not in {"estop", "estop_clear"}:
             await websocket.send(self._ack(message_id, "rejected", "estop_active"))
             print(f"[reject] {message_type} command_id={message_id} estop_active")
+            return
+
+        if message_type == "mower_defaults_set":
+            if not self._valid_defaults(payload):
+                await websocket.send(self._ack(message_id, "rejected", "invalid_mower_defaults"))
+                return
+            try:
+                if self.defaults_path:
+                    target = Path(self.defaults_path)
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    temporary = target.with_suffix(".tmp")
+                    temporary.write_text(json.dumps(payload))
+                    temporary.replace(target)
+            except OSError:
+                await websocket.send(self._ack(message_id, "rejected", "defaults_storage_failed"))
+                return
+            self.state.mower_defaults = payload
+            self.defaults_saved = True
+            self._ros_publish("/mower/config", payload)
+            self._ros_publish("/schedules/set", payload["schedule"])
+            await websocket.send(build_message("command_ack", {
+                "command_id": message_id, "status": "accepted",
+                "message": "Mower defaults saved", "defaults": payload, "saved": True,
+            }))
+            print(f"[ack] mower_defaults_set command_id={message_id}")
             return
 
         if message_type == "attachment_detect":
@@ -368,6 +417,30 @@ class SimulatedRobotServer:
                     },
                 )
             )
+
+    @staticmethod
+    def _valid_defaults(payload: Any) -> bool:
+        if not isinstance(payload, dict):
+            return False
+        for key, low, high in (("cut_height_mm", 25, 100),
+                               ("stripe_angle_degrees", 0, 180),
+                               ("pass_overlap_percent", 0, 30)):
+            value = payload.get(key)
+            if type(value) is not int or not low <= value <= high:
+                return False
+        if payload.get("pattern") not in ("straight", "diagonal", "checker", "spiral"):
+            return False
+        schedule = payload.get("schedule")
+        if not isinstance(schedule, dict) or type(schedule.get("enabled")) is not bool:
+            return False
+        days = schedule.get("days")
+        if (not isinstance(days, list) or
+                any(type(day) is not int or not 0 <= day <= 6 for day in days) or
+                len(set(days)) != len(days) or (schedule["enabled"] and not days)):
+            return False
+        return (type(schedule.get("hour")) is int and 0 <= schedule["hour"] <= 23 and
+                type(schedule.get("minute")) is int and 0 <= schedule["minute"] <= 59 and
+                schedule.get("zone_name") in ("Front Yard", "Back Yard", "Side Yard"))
 
     def _apply_command(self, message_type: str, payload: dict[str, Any]) -> None:
         if message_type == "drive_command":

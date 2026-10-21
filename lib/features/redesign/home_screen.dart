@@ -50,6 +50,17 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final defaults = context.watch<RobotCommandClient>().mowerDefaults;
+    final hasSavedSchedule = context
+        .watch<RobotCommandClient>()
+        .hasSavedMowerDefaults;
+    final days = defaults.days
+        .map(
+          (day) => const ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][day],
+        )
+        .join(', ');
+    final time =
+        '${defaults.hour.toString().padLeft(2, '0')}:${defaults.minute.toString().padLeft(2, '0')}';
     final scheduleEnabled = context.select<RobotCommandClient, bool>(
       (client) => client.mowerScheduleEnabled,
     );
@@ -209,7 +220,11 @@ class HomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Wed, 8:00 AM \u2022 Mower \u2022 Front Yard',
+                    !hasSavedSchedule
+                        ? 'No saved schedule loaded'
+                        : !scheduleEnabled
+                        ? 'Schedule paused \u2022 $days, $time \u2022 ${defaults.zone}'
+                        : '$days, $time \u2022 Mower \u2022 ${defaults.zone}',
                     style: choreText(10, weight: FontWeight.w200),
                   ),
                   const SizedBox(height: 12),
@@ -280,7 +295,7 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 32),
             Center(
               child: ChorePill(
-                'Re-run: Chore Mower | Front Yard',
+                'Re-run: Chore Mower | ${defaults.zone}',
                 width: 275,
                 height: 36,
                 fontSize: 12,
@@ -289,10 +304,15 @@ class HomeScreen extends StatelessWidget {
                   client.sendTaskStart(
                     taskId: 'mow-${DateTime.now().millisecondsSinceEpoch}',
                     taskType: 'mow',
-                    zoneId: 'zone_1',
-                    zoneName: 'Front Yard',
+                    zoneId: const {
+                      'Front Yard': 'zone_1',
+                      'Back Yard': 'zone_2',
+                      'Side Yard': 'zone_3',
+                    }[defaults.zone]!,
+                    zoneName: defaults.zone,
                     totalAreaSqM: 142,
-                    parameters: const {'pattern': 'straight'},
+                    parameters: client.mowerDefaults.toJson()
+                      ..remove('schedule'),
                   );
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(

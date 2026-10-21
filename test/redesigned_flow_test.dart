@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:chorerobotics/core/robot/robot_command_client.dart';
+import 'package:chorerobotics/core/robot/mower_defaults.dart';
+import 'package:chorerobotics/features/redesign/mower_defaults_screen.dart';
 import 'package:chorerobotics/core/weather/weather_controller.dart';
 import 'package:chorerobotics/features/redesign/attachment_screens.dart';
 import 'package:chorerobotics/features/redesign/home_screen.dart';
@@ -17,6 +19,18 @@ class _Client extends RobotCommandClient {
   int requests = 0;
   bool? scheduleEnabled;
   String? startedZone;
+  MowerDefaults? savedDefaults;
+  bool savedOnRobot = false;
+  @override
+  bool get hasSavedMowerDefaults => savedOnRobot;
+  @override
+  String? getMowerDefaults() => null;
+  @override
+  String? saveMowerDefaults(MowerDefaults defaults) {
+    savedDefaults = defaults;
+    return 'save-defaults';
+  }
+
   @override
   void sendScheduleSet({
     required String scheduleId,
@@ -92,6 +106,10 @@ Future<GoRouter> _mount(
   final router = GoRouter(
     initialLocation: path,
     routes: [
+      GoRoute(
+        path: '/mower-defaults',
+        builder: (_, _) => const MowerDefaultsScreen(),
+      ),
       GoRoute(path: '/home', builder: (_, _) => const HomeScreen()),
       GoRoute(
         path: '/attachments',
@@ -138,6 +156,12 @@ Future<GoRouter> _mount(
 }
 
 void main() {
+  test('defaults reject invalid server values before rendering sliders', () {
+    final payload = const MowerDefaults().toJson();
+    expect(MowerDefaults.fromJson(payload).cutHeight, 65);
+    payload['cut_height_mm'] = 1000;
+    expect(() => MowerDefaults.fromJson(payload), throwsFormatException);
+  });
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() async {
     final poppins = FontLoader('Poppins');
@@ -174,6 +198,15 @@ void main() {
         );
         await tester.tap(find.text('Next'));
         await tester.pumpAndSettle();
+        if (attachment.id == 'mower') {
+          await tester.scrollUntilVisible(
+            find.text('Save'),
+            160,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.tap(find.text('Save'));
+          await tester.pumpAndSettle();
+        }
         expect(find.text('Offline preview'), findsOneWidget);
         expect(
           find.byWidgetPredicate(
@@ -248,6 +281,7 @@ void main() {
       '/attachment-setup',
       '/connect-attachment/mower',
       '/setup-ready/mower',
+      '/mower-defaults',
     ]) {
       router.go(path);
       await tester.pump(const Duration(milliseconds: 400));
@@ -255,6 +289,51 @@ void main() {
     }
     await tester.pumpWidget(const SizedBox.shrink());
   });
+
+  testWidgets('defaults Save waits for matching ACK and surfaces rejection', (
+    tester,
+  ) async {
+    final client = _Client()..connected = true;
+    await _mount(tester, client, '/mower-defaults');
+    await tester.tap(find.text('Diagonal'));
+    await tester.scrollUntilVisible(
+      find.text('Save'),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('Save'));
+    await tester.pump();
+    expect(client.savedDefaults?.pattern, 'diagonal');
+    expect(client.savedDefaults?.cutHeight, 65);
+    client.ack('unrelated', 'accepted');
+    await tester.pump();
+    expect(find.text('Saving...'), findsOneWidget);
+    client.ack('save-defaults', 'rejected');
+    await tester.pump();
+    expect(find.text('test response'), findsOneWidget);
+    await tester.tap(find.text('Save'));
+    await tester.pump();
+    client.ack('save-defaults', 'accepted');
+    await tester.pumpAndSettle();
+    expect(find.text('Settings saved to robot'), findsOneWidget);
+  });
+
+  testWidgets(
+    'offline connection shows unreachable and retries after five seconds',
+    (tester) async {
+      final client = _Client();
+      await _mount(tester, client, '/connect-attachment/mower');
+      expect(find.text('Robot not reachable'), findsOneWidget);
+      client.connected = true;
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pump();
+      expect(client.requests, 1);
+      client.ack('request-1', 'accepted');
+      await tester.pump();
+      expect(find.text('Chore Mower Connected'), findsOneWidget);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
 
   testWidgets(
     'homepage schedule toggle survives navigation and re-run sends the Front Yard task',
@@ -282,6 +361,26 @@ void main() {
       await tester.tap(find.text('Configure New Attachment'));
       await tester.pumpAndSettle();
       expect(find.text('Auto Detect'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'homepage displays saved time, days and zone, never sample schedule',
+    (tester) async {
+      final client = _Client();
+      await _mount(tester, client, '/home');
+      expect(find.text('No saved schedule loaded'), findsOneWidget);
+      expect(find.textContaining('08:00'), findsNothing);
+      client.savedOnRobot = true;
+      client.mowerDefaults = const MowerDefaults(
+        hour: 23,
+        minute: 15,
+        zone: 'Side Yard',
+        days: [2, 4],
+      );
+      await tester.pump();
+      expect(find.textContaining('Tue, Thu, 23:15'), findsOneWidget);
+      expect(find.textContaining('08:00'), findsNothing);
     },
   );
 

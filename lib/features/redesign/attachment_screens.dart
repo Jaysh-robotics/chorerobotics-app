@@ -268,6 +268,8 @@ class _ConnectAttachmentScreenState extends State<ConnectAttachmentScreen> {
   final _serial = TextEditingController();
   StreamSubscription<Map<String, dynamic>>? _subscription;
   Timer? _timeout;
+  Timer? _retryTimer;
+  bool _retrying = false;
   String? _commandId, _error;
   bool _confirmed = false;
   bool _waiting = true;
@@ -282,6 +284,21 @@ class _ConnectAttachmentScreenState extends State<ConnectAttachmentScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _request();
     });
+    _retryTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (mounted && !_confirmed && !_waiting) _retry();
+    });
+  }
+
+  Future<void> _retry() async {
+    if (_retrying) return;
+    _retrying = true;
+    try {
+      final client = context.read<RobotCommandClient>();
+      if (!client.isConnected) await client.connect();
+      if (mounted) _request();
+    } finally {
+      _retrying = false;
+    }
   }
 
   void _request() {
@@ -303,11 +320,14 @@ class _ConnectAttachmentScreenState extends State<ConnectAttachmentScreen> {
       _timeout = Timer(const Duration(seconds: 10), () {
         if (mounted) {
           setState(() {
+            _commandId = null;
             _waiting = false;
             _error = 'No acknowledgement. Tap Retry.';
           });
         }
       });
+    } else {
+      setState(() => _waiting = false);
     }
   }
 
@@ -320,6 +340,7 @@ class _ConnectAttachmentScreenState extends State<ConnectAttachmentScreen> {
       return;
     }
     _timeout?.cancel();
+    _retryTimer?.cancel();
     setState(() {
       _waiting = false;
       _confirmed = payload['status'] == 'accepted';
@@ -339,6 +360,7 @@ class _ConnectAttachmentScreenState extends State<ConnectAttachmentScreen> {
 
   @override
   void dispose() {
+    _retryTimer?.cancel();
     _timeout?.cancel();
     _subscription?.cancel();
     _serial.dispose();
@@ -351,6 +373,68 @@ class _ConnectAttachmentScreenState extends State<ConnectAttachmentScreen> {
       return const _UnknownAttachment();
     }
     final client = context.watch<RobotCommandClient>();
+    if (!client.isConnected) {
+      return ChoreFrame(
+        title: 'Connect Attachment',
+        back: '/attachments',
+        body: SingleChildScrollView(
+          child: SizedBox(
+            height: 610,
+            child: Column(
+              children: [
+                const SizedBox(height: 24),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 32),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A1104),
+                    border: Border.all(color: choreOrange),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Text(
+                    'No connection to robot. Connect via Bluetooth or Wi-Fi first.',
+                    style: choreText(12),
+                  ),
+                ),
+                const SizedBox(height: 135),
+                Container(
+                  width: 96,
+                  height: 96,
+                  decoration: BoxDecoration(
+                    color: choreSurface,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: const Icon(
+                    Icons.mobile_off,
+                    color: Colors.red,
+                    size: 60,
+                  ),
+                ),
+                const SizedBox(height: 28),
+                Text(
+                  'Robot not reachable',
+                  style: choreText(18, weight: FontWeight.w700),
+                ),
+                Text(
+                  'Retrying every 5 seconds...',
+                  style: choreText(12, color: choreMuted),
+                ),
+                const SizedBox(height: 30),
+                ChorePill(
+                  'Next',
+                  onPressed: () => context.go(
+                    _attachmentId == 'mower'
+                        ? '/mower-defaults'
+                        : '/setup-ready/$_attachmentId?confirmed=false',
+                  ),
+                ),
+                ChorePill('Retry Now', onPressed: _retry),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     return ChoreFrame(
       title: 'Connect Attachment',
       back: '/attachments',
@@ -480,7 +564,9 @@ class _ConnectAttachmentScreenState extends State<ConnectAttachmentScreen> {
                         'Next',
                         onPressed: (!client.isConnected || _confirmed)
                             ? () => context.go(
-                                '/setup-ready/$_attachmentId?confirmed=${client.isConnected && _confirmed}',
+                                _attachmentId == 'mower'
+                                    ? '/mower-defaults'
+                                    : '/setup-ready/$_attachmentId?confirmed=${client.isConnected && _confirmed}',
                               )
                             : null,
                       ),

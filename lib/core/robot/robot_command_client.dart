@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'mower_defaults.dart';
 
 enum RobotCommandConnectionStatus { disconnected, connecting, connected, error }
 
@@ -53,6 +54,28 @@ class RobotCommandClient extends ChangeNotifier {
   int _sentCount = 0;
   int _ackCount = 0;
   bool _mowerScheduleEnabled = true;
+  MowerDefaults _mowerDefaults = const MowerDefaults();
+  bool _hasSavedMowerDefaults = false;
+  final Set<String> _defaultsRequests = {};
+  bool get hasSavedMowerDefaults => _hasSavedMowerDefaults;
+  MowerDefaults get mowerDefaults => _mowerDefaults;
+  set mowerDefaults(MowerDefaults value) {
+    _mowerDefaults = value;
+    _mowerScheduleEnabled = value.enabled;
+    notifyListeners();
+  }
+
+  String? getMowerDefaults() {
+    final id = _send('mower_defaults_get', const {});
+    if (id != null) _defaultsRequests.add(id);
+    return id;
+  }
+
+  String? saveMowerDefaults(MowerDefaults defaults) {
+    final id = _send('mower_defaults_set', defaults.toJson());
+    if (id != null) _defaultsRequests.add(id);
+    return id;
+  }
 
   RobotCommandConnectionStatus get status => _status;
   String? get errorMessage => _errorMessage;
@@ -78,6 +101,8 @@ class RobotCommandClient extends ChangeNotifier {
       setServerUrl(url);
     }
     await disconnect();
+    _hasSavedMowerDefaults = false;
+    _mowerDefaults = const MowerDefaults();
     _setStatus(RobotCommandConnectionStatus.connecting);
 
     try {
@@ -96,9 +121,10 @@ class RobotCommandClient extends ChangeNotifier {
           }
         },
       );
-      await channel.ready;
+      await channel.ready.timeout(const Duration(seconds: 8));
       _setStatus(RobotCommandConnectionStatus.connected);
       sendPing();
+      getMowerDefaults();
     } catch (error) {
       await _subscription?.cancel();
       _subscription = null;
@@ -110,6 +136,7 @@ class RobotCommandClient extends ChangeNotifier {
   }
 
   Future<void> disconnect() async {
+    _defaultsRequests.clear();
     await _subscription?.cancel();
     _subscription = null;
     await _channel?.sink.close();
@@ -199,14 +226,13 @@ class RobotCommandClient extends ChangeNotifier {
 
   void setMowerScheduleEnabled(bool enabled) {
     _mowerScheduleEnabled = enabled;
-    // shortcut: the redesigned dashboard uses a sample schedule until cloud schedules are integrated.
     sendScheduleSet(
       scheduleId: 'mower-weekly',
-      hour: 8,
-      minute: 0,
-      period: 'AM',
-      days: const [3],
-      taskParameters: const {'pattern': 'straight'},
+      hour: mowerDefaults.hour % 12 == 0 ? 12 : mowerDefaults.hour % 12,
+      minute: mowerDefaults.minute,
+      period: mowerDefaults.hour < 12 ? 'AM' : 'PM',
+      days: mowerDefaults.days,
+      taskParameters: mowerDefaults.toJson()..remove('schedule'),
       enabled: enabled,
     );
     notifyListeners();
@@ -282,6 +308,18 @@ class RobotCommandClient extends ChangeNotifier {
       _lastInboundRaw = raw.toString();
       final decoded = jsonDecode(raw.toString());
       if (decoded is! Map<String, dynamic>) return;
+      final payload = decoded['payload'];
+      if (decoded['type'] == 'command_ack' &&
+          payload is Map &&
+          _defaultsRequests.remove(payload['command_id'])) {
+        if (payload['status'] == 'accepted' && payload['defaults'] is Map) {
+          final defaults = MowerDefaults.fromJson(
+            Map<String, dynamic>.from(payload['defaults']),
+          );
+          _hasSavedMowerDefaults = payload['saved'] == true;
+          mowerDefaults = defaults;
+        }
+      }
       _messageController.add(decoded);
       final type = decoded['type']?.toString();
       if (type == 'command_ack' || type == 'pong') {

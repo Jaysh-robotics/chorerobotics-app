@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/connection/presentation/connection_screen.dart';
 import '../../features/redesign/home_screen.dart';
 import '../../features/redesign/attachment_screens.dart';
+import '../../features/redesign/mower_defaults_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -10,6 +11,10 @@ class AppRouter {
   static final router = GoRouter(
     initialLocation: '/splash',
     routes: [
+      GoRoute(
+        path: '/mower-defaults',
+        builder: (context, state) => const MowerDefaultsScreen(),
+      ),
       GoRoute(
         path: '/connection',
         name: 'connection',

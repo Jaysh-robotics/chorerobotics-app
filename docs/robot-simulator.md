@@ -150,3 +150,28 @@ Not included yet:
 - TLS/mTLS or pairing-token auth from Flutter.
 - mDNS discovery.
 
+# Mower Defaults Setup
+
+Select Chore Mower, connect the attachment, then choose Next to edit defaults.
+Save sends one atomic `mower_defaults_set` command containing `cut_height_mm`
+(25-100), `pattern` (straight/diagonal/checker/spiral),
+`stripe_angle_degrees` (0-180), `pass_overlap_percent` (0-30), and `schedule`:
+`enabled`, `days` (Sunday=0), `hour` (0-23), `minute`, `zone_name`.
+The screen reads these back using `mower_defaults_get` and only shows a confirmed
+Ready screen after a matching accepted ACK. Offline Save is an in-memory preview.
+Both get and set ACKs include `defaults` and a `saved` boolean. The shared app
+client also fetches defaults immediately after connecting, so Home restores the
+saved time, days and zone without opening the setup screen. Initial factory
+values are not displayed as an upcoming saved schedule.
+
+Docker stores accepted defaults in the `robot-sim-data` named volume. Rebuild
+after updating: `docker compose -f docker-compose.robot-sim.yml up --build -d`.
+Deleting that volume deletes saved defaults. Without `CHOREROBOT_DEFAULTS_PATH`,
+standalone Python stores defaults only in memory.
+
+The unreachable screen retries the shared configured WebSocket endpoint every
+five seconds, without opening a separate per-screen connection. Configure that
+endpoint through Settings first. Bluetooth setup is not implemented by this simulator.
+Schedule settings are stored and logged, not executed by a calendar scheduler;
+ROS publications remain simulated log entries rather than physical robot control.
+
